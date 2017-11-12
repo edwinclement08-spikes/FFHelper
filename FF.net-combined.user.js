@@ -10,7 +10,6 @@
 // @grant         GM_xmlhttpRequest
 // @grant         GM_addStyle
 // @require       http://code.jquery.com/jquery-1.12.4.min.js
-// @require       http://code.interactjs.io/v1.2.9/interact.js
 // ==/UserScript==
 
 // Credit
@@ -22,12 +21,13 @@ $("body").append($(`<style>
         color:#fff ;
         background-color: #000 !important;
     }
+
     /* Bookmarks Division */
     #bookmarksDiv {
         position:fixed;
         background:lightgrey;
         border: grey thin solid;
-        bottom:10%; right:1%;
+        top:75%; left:80%;
         min-height: 10%; min-width: 10%;
         user-select:none !important;
         z-index:100;
@@ -101,6 +101,10 @@ var pageURL = window.location.href;
 
 var pageType;
 var pageId;
+
+var x_pos = 0,
+y_pos = 0;
+
 
 if (jQuery.isEmptyObject(db)){
     console.log("Empty DB. First time running?");
@@ -180,44 +184,69 @@ function enhanceStory() {
 
     createBookmarksBar();
 
-    interact('.draggable')
-        .draggable({
-        // enable inertial throwing
-        inertia: true,
-        // keep the element within the area of it's parent
-        restrict: {
-            restriction: "parent",
-            endOnly: true,
-            elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
-        },
-        // enable autoScroll
-        autoScroll: true,
+    addListeners();
 
-        // call this function on every dragmove event
-        onmove: dragMoveListener,
-        // call this function on every dragend event
-        onend: function (event) {
-            var textEl = event.target.querySelector('p');
-
-            if(textEl) (textEl.textContent =        'moved a distance of '     + (Math.sqrt(event.dx * event.dx + event.dy * event.dy)|0) + 'px');
-        }
-    });
-
-    function dragMoveListener (event) {
-        var target = event.target,
-            // keep the dragged position in the data-x/data-y attributes
-            x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
-            y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-        // translate the element
-        target.style.webkitTransform =
-            target.style.transform =
-            'translate(' + x + 'px, ' + y + 'px)';
-
-        // update the posiion attributes
-        target.setAttribute('data-x', x);
-        target.setAttribute('data-y', y);
+    function addListeners() {
+      document.getElementsByClassName('draggable')[0].addEventListener('mousedown', mouseDown, false);
+      window.addEventListener('mouseup', mouseUp, false);
     }
+
+    function mouseUp() {
+      window.removeEventListener('mousemove', divMove, true);
+    }
+
+    function mouseDown(e) {
+      var div = document.getElementsByClassName('draggable')[0];
+      x_pos = e.clientX - div.offsetLeft;
+      y_pos = e.clientY - div.offsetTop;
+      window.addEventListener('mousemove', divMove, true);
+    }
+
+    function divMove(e) {
+      var div = document.getElementsByClassName('draggable')[0];
+    //   div.style.position = 'absolute';
+      div.style.top = (e.clientY - y_pos) + 'px';
+      div.style.left = (e.clientX - x_pos) + 'px';
+    }
+
+    // interact('.draggable')
+    //     .draggable({
+    //     // enable inertial throwing
+    //     inertia: true,
+    //     // keep the element within the area of it's parent
+    //     restrict: {
+    //         restriction: "parent",
+    //         endOnly: true,
+    //         elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+    //     },
+    //     // enable autoScroll
+    //     autoScroll: true,
+
+    //     // call this function on every dragmove event
+    //     onmove: dragMoveListener,
+    //     // call this function on every dragend event
+    //     onend: function (event) {
+    //         var textEl = event.target.querySelector('p');
+
+    //         if(textEl) (textEl.textContent =        'moved a distance of '     + (Math.sqrt(event.dx * event.dx + event.dy * event.dy)|0) + 'px');
+    //     }
+    // });
+
+    // function dragMoveListener (event) {
+    //     var target = event.target,
+    //         // keep the dragged position in the data-x/data-y attributes
+    //         x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+    //         y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+    //     // translate the element
+    //     target.style.webkitTransform =
+    //         target.style.transform =
+    //         'translate(' + x + 'px, ' + y + 'px)';
+
+    //     // update the posiion attributes
+    //     target.setAttribute('data-x', x);
+    //     target.setAttribute('data-y', y);
+    // }
 }
 
 function addButtons() {
