@@ -50,6 +50,7 @@ GM_addStyle(`
 
 `);
 
+function toInt(n){ return Math.round(Number(n)); }
 
 var chapters = [];
 
@@ -272,7 +273,7 @@ function exportCh() {
 }
 function exportRest(e) {
     var chap_select = document.getElementById('chap_select');
-    
+
     exportChapters(e, chap_select.value - 1);
 }
 function exportChapters(e, start, end) {
@@ -411,11 +412,11 @@ function createBookmarksBar (){
     var body = $('body');
 
     var style = $(`<style type='text/css'>
-#bookmarksDiv {position:fixed; background:lightgrey; border: grey thin solid; top:20%; right:1%;  min-height: 10%; min-width: 10%; user-select:none !important ; z-index:100;}
+#bookmarksDiv {position:fixed; background:lightgrey; border: grey thin solid; bottom:10%; right:1%;  min-height: 10%; min-width: 10%; user-select:none !important ; z-index:100;}
 #bookmarksDiv > .title_edwin {padding:5px;  border: grey thin solid; }
 #bookmarksDiv .content_edwin  {padding:2px;}
 #bookmarksDiv .content_edwin .bookmarkItem {    border: grey 2px solid; margin: 2px;}
-#bookmarksDiv .content_edwin .bookmarkItem input {width:100px; cursor:pointer}
+#bookmarksDiv .content_edwin .bookmarkItem input {width:85px; cursor:pointer}
 #bookmarksDiv .content_edwin .bookmarkItem span {padding:5px; cursor:pointer}
 #bookmarksDiv .drag_right_edwin {float: right; padding: 0px 2px;}
 .hvr-temp {  display: inline-block;  vertical-align: middle;  -webkit-transform: perspective(1px) translateZ(0);  transform: perspective(1px) translateZ(0);  box-shadow: 0 0 1px transparent;  overflow: hidden;  -webkit-transition-duration: 0.3s;  transition-duration: 0.3s;  -webkit-transition-property: color, background-color, box-shadow;    transition-property: color, background-color,  box-shadow;}
@@ -441,7 +442,7 @@ function createBookmarksBar (){
 
                     var node = `<div class="bookmarkItem" onclick="bookmarkItemClick(event)">
 <input class="BookmarkName" type="text" value="${bookmarks[i][0]}" readonly="true" ondblclick="editBoxDblClick(event);" onkeydown="editBoxKey(event);" >
-<input class="ScrollPoint" type="number" value="${bookmarks[i][1]}" readonly="true" ondblclick="editBoxDblClick(event);" onkeydown="editBoxKey(event);">
+<input class="ScrollPoint" type="number" value="${toInt(bookmarks[i][1])}" readonly="true" ondblclick="editBoxDblClick(event);" onkeydown="editBoxKey(event);">
 <span class="hvr-temp" onclick="bookmarkItemDelete(event);">x</span>
 </div>`;
                     var tag = `<div class="bookmark-tag" style="top:${bookmarks[i][1] + 30}px"><b>${bookmarks[i][0]}</b></div>`;
@@ -478,10 +479,9 @@ function editBoxKey(event) {
         var bookmarkItemName = bookmarkItem.children[0].value;
         var bookmarkItemValue = bookmarkItem.children[1].value;
 
-        
         // delete it
         db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
-        
+
         var ficId = ${ficId };
         var bookmarks = db.fics[ficId].bookmarks;
         for (let i = 0; i < bookmarks.length; i++) {
@@ -493,7 +493,7 @@ function editBoxKey(event) {
         localStorage.setItem("FFSaveLocation", JSON.stringify(db));
         /////////////
 
-        
+
         // update the value
     } else {
     }
@@ -522,10 +522,10 @@ function bookmarkItemDelete(event) {
     var bookmarkItem = event.target.parentNode;
 
     var bookmarkItemName = bookmarkItem.children[0].value;
-    
+
     // delete it
     db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
-    
+
     var ficId = ${ficId };
     var bookmarks = db.fics[ficId].bookmarks;
     for (let i = 0; i < bookmarks.length; i++) {
@@ -541,21 +541,21 @@ function bookmarkItemDelete(event) {
     event.stopPropagation();
 }
 
+function toInt(n){ return Math.round(Number(n)); }
 
 function bookmarkItemAdd(event) {
     db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
-    
+
     var ficId = ${ficId };
 
-    db.fics[ficId].bookmarks.push(["BM-" + window.pageYOffset, window.pageYOffset]);
+    db.fics[ficId].bookmarks.push(["BM-" + toInt(window.pageYOffset), toInt(window.pageYOffset)]);
     localStorage.setItem("FFSaveLocation", JSON.stringify(db));
 
     var node = \`<div class="bookmarkItem" onclick="bookmarkItemClick(event)">
-<input class="BookmarkName" type="text" value="\`+"BM-"+window.pageYOffset +\`" readonly="true" ondblclick="editBoxDblClick(event);" onkeydown="editBoxKey(event);" >
-<input class="ScrollPoint" type="number" value="\` +window.pageYOffset +\`" readonly="true" ondblclick="editBoxDblClick(event);" onkeydown="editBoxKey(event);">
+<input class="BookmarkName" type="text" value="\`+"BM-"+toInt(window.pageYOffset) +\`" readonly="true" ondblclick="editBoxDblClick(event);" onkeydown="editBoxKey(event);" >
+<input class="ScrollPoint" type="number" value="\` +toInt(window.pageYOffset) +\`" readonly="true" ondblclick="editBoxDblClick(event);" onkeydown="editBoxKey(event);">
 <span class="hvr-temp" onclick="bookmarkItemDelete(event);">x</span>
 </div>\`;
-
 
 var content = document.querySelector("#bookmarksDiv .content_edwin");
 content.innerHTML = content.innerHTML + node;
