@@ -512,34 +512,47 @@ var timer;
 function editBoxDblClick(event) {
     if (timer) clearTimeout(timer);
     event.target.readOnly = false;
+    event.target.setAttribute("original", event.target.value);
 }
 
 function editBoxKey(event) {
     if (event.key == "Enter") {
-
         event.target.readOnly = true;
-        ///////////
-        var bookmarkItem = event.target.parentNode;
 
+        inputName = event.target.className;
+
+        var bookmarkItem = event.target.parentNode;
         var bookmarkItemName = bookmarkItem.children[0].value;
         var bookmarkItemValue = bookmarkItem.children[1].value;
 
         // delete it
         db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
-
-        var ficId = ${ficId };
+        var ficId = ${ficId};
         var bookmarks = db.fics[ficId].bookmarks;
-        for (let i = 0; i < bookmarks.length; i++) {
-            if (bookmarks[i][0] == bookmarkItemName) {
-                db.fics[ficId].bookmarks[i][1] = bookmarkItemValue;
-                break;
+
+        if(inputName == "BookmarkName") {
+            var bookmarkItemOldName = event.target.getAttribute("original");
+            event.target.removeAttribute("original");
+
+            for (let i = 0; i < bookmarks.length; i++) {
+                if (bookmarks[i][0] == bookmarkItemOldName) {
+                    console.log("GOTCHA");
+                    db.fics[ficId].bookmarks[i][0] = bookmarkItemName;
+                    break;
+                }
+            }
+        } else if (inputName == "ScrollPoint"){
+            event.target.removeAttribute("original");
+
+            for (let i = 0; i < bookmarks.length; i++) {
+                if (bookmarks[i][0] == bookmarkItemName) {
+                    console.log("GOTCHA");
+                    db.fics[ficId].bookmarks[i][1] = bookmarkItemValue;
+                    break;
+                }
             }
         }
         localStorage.setItem("FFSaveLocation", JSON.stringify(db));
-        /////////////
-
-
-        // update the value
     } else {
     }
 }
