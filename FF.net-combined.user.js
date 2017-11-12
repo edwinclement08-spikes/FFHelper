@@ -80,6 +80,14 @@ $("body").append($(`<style>
     border: #63746B solid thin;
     display:inline-block;
     }
+
+    /* ffnet */
+    .ffne_action {padding-right: 7px; cursor:pointer;} 
+    .ffne_action:hover {} 
+    #ffne_export {} 
+    #ffne {float:right;margin-left: 0.9em;} 
+    #ffne_button {font-size:1.3em;cursor:pointer;line-height: 1em;padding-right: 7px;} 
+    .ffne_hidden {display:none;}
 </style>`));
 
 
@@ -88,11 +96,10 @@ function toInt(n){ return Math.round(Number(n)); }
 var chapters = [];
 
 var style = $("<style type='text/css'> .ffne_action{padding-right: 7px; cursor:pointer;} .ffne_action:hover{} #ffne_export{ } #ffne{float:right;margin-left: 0.9em;} #ffne_button{font-size:1.3em;cursor:pointer;line-height: 1em;padding-right: 7px;} .ffne_hidden{display:none;}</style>");
-$('body').append(style);
+//$('body').append(style);
 
 var db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
 var scrollPoint;
-
 
 function addButtons() {
     // Adding buttons
@@ -101,22 +108,11 @@ function addButtons() {
     var node = $('.lc').first();
     var exportMenu = $('<span id="ffne"><span id="ffne_button" class="xcontrast_txt">fE</span></span>');
     var exportContainer = $('<span id="ffne_export"></span>');
-    //var addHeadersButton = $('<span href="javascript:" class="ffne_action" title="Add header to each chapter">Headers</span>');
-    //var addIndexButton = $('<span href="javascript:" class="ffne_action" title="Create table of contents">Index</span>');
-    //var addTitleButton = $('<span href="javascript:" class="ffne_action" title="Insert title and author">Title</span>');
     var expAllButton = $('<span href="javascript:" class="ffne_action" id="exportAllButton" title="Show the whole story on one page">Story</span>');
-    //var expRestButton = $('<span href="javascript:" class="ffne_action" id="exportRestButton" title="Export chapters from the current to the last one">Rest</span>');
-    //var expButton = $('<span href="javascript:" class="ffne_action" title="Show only text">Text</span>');
     exportMenu.append(exportContainer);
-    // exportContainer.append(expAllButton, expRestButton, expButton, '|&nbsp;&nbsp;', addHeadersButton, addTitleButton, addIndexButton);
     exportContainer.append(expAllButton);
     node.append(exportMenu);
     expAllButton.click(exportChapters);
-    //expRestButton.click(exportRest);
-    //expButton.click(exportCh);
-    //addHeadersButton.click(addHeaders);
-    //addTitleButton.click(addTitle);
-    //addIndexButton.click(addIndex);
     $('#ffne_button').click(function () {
         var cont = $('#ffne_export');
         if (cont.hasClass('ffne_hidden')) { cont.removeClass('ffne_hidden'); } else { cont.addClass('ffne_hidden') ;}
@@ -137,7 +133,7 @@ function addCompletionBadge(){
 
     var badgeTemplate = `
 <span class="badge-local badge-local-${isCompleted ? "completed" :"wip"}">
-  <span class="status">edwin_color_white
+  <span class="status">
 ${isCompleted ? "Completed" :"Work in Progress"}
   </span>
   <span class="noOfWords">
@@ -165,11 +161,6 @@ ${isCompleted ? "Completed" :"Work in Progress"}
     $('#profile_top').addClass('night-mode');
     $('.lc').addClass('night-mode');
 
-    // $('body').css("background-color", "#000");
-    // $('#content_parent').css("background-color", "#000");
-    // $('#content_wrapper').css("background-color", "#000");
-    // $('#storytext').addClass('night-mode');
-    // $('#profile_top').addClass('night-mode');
 
     $(' #profile_top .xgray.xcontrast_txt').addClass("metadata").removeClass('xgray');
 
@@ -178,7 +169,6 @@ ${isCompleted ? "Completed" :"Work in Progress"}
     $("#storytext").css("fontSize",  "1.5em");
 
     addCompletionBadge();
-
 
     //Adding buttons to page;
     addButtons();
