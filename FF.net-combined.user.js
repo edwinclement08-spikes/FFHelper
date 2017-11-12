@@ -60,7 +60,7 @@ $("body").append($(`<style>
     }
     .badge-local .status{
     font-weight:bold;
-    }
+    } 
 
     .badge-local .noOfWords{
     border-left: #63746B solid thin;
@@ -102,9 +102,7 @@ var pageURL = window.location.href;
 var pageType;
 var pageId;
 
-var x_pos = 0,
-y_pos = 0;
-
+var x_pos = 0, y_pos = 0;
 
 if (jQuery.isEmptyObject(db)){
     console.log("Empty DB. First time running?");
@@ -127,11 +125,20 @@ if (jQuery.isEmptyObject(db)){
             } else if(pageInfo[1] === "u"){
                 // Its a user
                 console.log("User.");
+                enhanceUser();
             }
         }
     });
 }
 
+function enhanceUser(){
+    $('body').addClass("night-mode");
+    $("body")[0].style = "margin-top: 0px;";
+
+    $("#content_wrapper").css('background-color', 'inherit');
+
+    $("#content_wrapper_inner a").css('color', '#79a00f');
+}
 
 function enhanceStory() {
     $('body').addClass("night-mode");
@@ -265,10 +272,7 @@ function addTitle() {
     var storytext = $('#storytext');
     storytext.prepend(author, title);
 }
-function exportCh() {
-    document.body.innerHTML = '<div style=\'padding-left:2em;padding-right:2em;padding-top:1em;\'>' + document.getElementById('storytextp').innerHTML + '</div>';
-    //Sadly, it is not possible to automatically copy text to clipboard in firefox without changing browser settings;
-}
+
 function exportRest(e) {
     var chap_select = document.getElementById('chap_select');
 
@@ -346,6 +350,7 @@ function parseChapter(chapterHtml, chapterNumber) {
     chapterContent.innerHTML = xpathResult.snapshotItem(0).innerHTML;
     return chapterContent;
 }
+
 function getChapterName(obj) {
     var select = obj.getElementsByTagName('select')[1].getElementsByTagName('option');
     for (var i = 0; i < select.length; i++) {
@@ -408,8 +413,6 @@ function allChapterDoneEDWIN(){
 
 function createBookmarksDiv (){
     var body = $('body');
-
-
 
     var bookmarksDiv = $('<div id="bookmarksDiv" class="draggable"><div class="title_edwin">Bookmarks<span class="drag_right_edwin hvr-temp" onclick="bookmarkItemAdd(event);">+</span></div><div class="content_edwin"></div></div>');
     var contentArray = [];
@@ -572,7 +575,7 @@ function bookmarkItemAdd(event) {
     var node = \`<div class="bookmarkItem" onclick="bookmarkItemClick(event)">
 <input class="BookmarkName" type="text" value="\`+"BM-"+toInt(window.pageYOffset) +\`" readonly="true" ondblclick="editBoxDblClick(event);" onkeydown="editBoxKey(event);" >
 <input class="ScrollPoint" type="number" value="\` +toInt(window.pageYOffset) +\`" readonly="true" ondblclick="editBoxDblClick(event);" onkeydown="editBoxKey(event);">
-<span class="hvr-temp" onclick="bookmarkItemDelete(event);">x </span>
+<span class="hvr-temp" onclick="bookmarkItemDelete(event)">x</span>
 </div>\`;
 
 var content = document.querySelector("#bookmarksDiv .content_edwin");
