@@ -110,21 +110,20 @@ var scrollPoint;
     $('#storytext').addClass('night-mode');
     $('#profile_top').addClass('night-mode');
     $('.lc').addClass('night-mode');
+    // add another class so that we can quickly navigate to that afterwords
+    $('#profile_top .xgray.xcontrast_txt').addClass("metadata").removeClass('xgray');
 
-
-    $(' #profile_top .xgray.xcontrast_txt').addClass("metadata").removeClass('xgray');
-
-
+    // set default width and font size
     _fontastic_change_width(75);
     $("#storytext").css("fontSize",  "1.5em");
 
+    // add the badges
     addCompletionBadge();
-
     //Adding buttons to page;
     addButtons();
 
     exportRest();
-    addIndex();
+    
 
 
     if (jQuery.isEmptyObject(db)){
@@ -330,6 +329,7 @@ function exportChapters(e, start, end) {
             if (storyLength == 0) {
                 parseStory(chapters);
                 expText.nodeValue = 'Story (again)';
+                addIndex();
                 allChapterDoneEDWIN();
             }
         });
