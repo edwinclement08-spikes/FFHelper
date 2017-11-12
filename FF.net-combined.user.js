@@ -19,7 +19,7 @@
 $("body").append($(`<style>
     .night-mode {
         color:#fff ;
-        background-color: #000 !important;
+        background-color: #000;
     }
 
     /* Bookmarks Division */
@@ -42,7 +42,7 @@ $("body").append($(`<style>
 
     #bookmarksDiv > .title_edwin                        {padding:5px; border: grey thin solid; }
     #bookmarksDiv .content_edwin                        {padding:2px;}
-    #bookmarksDiv .content_edwin .bookmarkItem          {border: grey 2px solid; margin: 2px;}
+    #bookmarksDiv .content_edwin .#content_wrapperbookmarkItem          {border: grey 2px solid; margin: 2px;}
     #bookmarksDiv .content_edwin .bookmarkItem input    {width:85px; cursor:pointer}
     #bookmarksDiv .content_edwin .bookmarkItem span     {padding:5px; cursor:pointer}
     #bookmarksDiv .drag_right_edwin                     {float: right; padding: 0px 2px;}
@@ -140,6 +140,10 @@ function enhanceStory() {
     $('#storytext').addClass('night-mode');
     $('#profile_top').addClass('night-mode');
     $('.lc').addClass('night-mode');
+
+    $("#content_wrapper").css('background-color', 'inherit');
+    $("body").css('background-color', 'inherit');
+
     // add another class so that we can quickly navigate to that afterwords
     $('#profile_top .xgray.xcontrast_txt').addClass("metadata").removeClass('xgray');
 
@@ -182,33 +186,7 @@ function enhanceStory() {
         localStorage.setItem("FFSaveLocation", JSON.stringify(db));
     }
 
-    createBookmarksBar();
-
-    addListeners();
-
-    function addListeners() {
-      document.getElementsByClassName('draggable')[0].addEventListener('mousedown', mouseDown, false);
-      window.addEventListener('mouseup', mouseUp, false);
-    }
-
-    function mouseUp() {
-      window.removeEventListener('mousemove', divMove, true);
-    }
-
-    function mouseDown(e) {
-      var div = document.getElementsByClassName('draggable')[0];
-      x_pos = e.clientX - div.offsetLeft;
-      y_pos = e.clientY - div.offsetTop;
-      window.addEventListener('mousemove', divMove, true);
-    }
-
-    function divMove(e) {
-      var div = document.getElementsByClassName('draggable')[0];
-    //   div.style.position = 'absolute';
-      div.style.top = (e.clientY - y_pos) + 'px';
-      div.style.left = (e.clientX - x_pos) + 'px';
-    }
-
+    createBookmarksDiv();
 }
 
 function addButtons() {
@@ -428,7 +406,7 @@ function allChapterDoneEDWIN(){
     });
 }
 
-function createBookmarksBar (){
+function createBookmarksDiv (){
     var body = $('body');
 
 
@@ -467,6 +445,26 @@ function createBookmarksBar (){
     body.prepend(bookmarksDiv);
     $("#bookmarksDiv .content_edwin").append(allBookmarks);
 
+    document.getElementsByClassName('draggable')[0].addEventListener('mousedown', mouseDown, false);
+    window.addEventListener('mouseup', mouseUp, false);
+
+    function mouseUp() {
+      window.removeEventListener('mousemove', divMove, true);
+    }
+
+    function mouseDown(e) {
+      var div = document.getElementsByClassName('draggable')[0];
+      x_pos = e.clientX - div.offsetLeft;
+      y_pos = e.clientY - div.offsetTop;
+      window.addEventListener('mousemove', divMove, true);
+    }
+
+    function divMove(e) {
+      var div = document.getElementsByClassName('draggable')[0];
+    //   div.style.position = 'absolute';
+      div.style.top = (e.clientY - y_pos) + 'px';
+      div.style.left = (e.clientX - x_pos) + 'px';
+    }
 
     script = $(`<script>
 
