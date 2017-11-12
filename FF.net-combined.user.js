@@ -13,16 +13,44 @@
 // @require		  http://code.interactjs.io/v1.2.9/interact.js
 // ==/UserScript==
 
-
 // Credit
 // FanFictionNavigator (by Andy Scull)  https://greasyfork.org/en/scripts/25670-fanfictionnavigator 
 // Fanfiction.net story export script (by Alssn) https://greasyfork.org/en/scripts/6272-fanfiction-net-story-export-script
 
+$("body").append($(`<style>
+    .night-mode {  
+        color:#fff ;
+        background-color: #000 !important;
+    }
+    
+    /* Bookmarks Division */
+    #bookmarksDiv {
+        position:fixed; 
+        background:lightgrey; 
+        border: grey thin solid; 
+        bottom:10%; right:1%;  
+        min-height: 10%; min-width: 10%; 
+        user-select:none !important; 
+        z-index:100;
+    }
+    .bookmark-tag {
+        color: cornsilk;    
+        position: absolute;   
+        background-color: seagreen !important;    
+        padding: 5px;    
+        z-index: 0;
+    }
 
+    #bookmarksDiv > .title_edwin                        {padding:5px; border: grey thin solid; }
+    #bookmarksDiv .content_edwin                        {padding:2px;}
+    #bookmarksDiv .content_edwin .bookmarkItem          {border: grey 2px solid; margin: 2px;}
+    #bookmarksDiv .content_edwin .bookmarkItem input    {width:85px; cursor:pointer}
+    #bookmarksDiv .content_edwin .bookmarkItem span     {padding:5px; cursor:pointer}
+    #bookmarksDiv .drag_right_edwin                     {float: right; padding: 0px 2px;}
+    .hvr-temp {  display: inline-block;  vertical-align: middle;  -webkit-transform: perspective(1px) translateZ(0);  transform: perspective(1px) translateZ(0);  box-shadow: 0 0 1px transparent;  overflow: hidden;  -webkit-transition-duration: 0.3s;  transition-duration: 0.3s;  -webkit-transition-property: color, background-color, box-shadow;    transition-property: color, background-color,  box-shadow;}
+    .hvr-temp:hover, .hvr-temp:focus, .hvr-temp:active {  background-color: #2098D1;  color: white;  box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);}
 
-GM_addStyle(".edwin_color_white {  color:#fff ;}");
-
-GM_addStyle(`
+    /* Badges */
     .badge-local {
     margin: 2px;
     border-radius: 5px;
@@ -33,8 +61,7 @@ GM_addStyle(`
     }
     .badge-local .status{
     font-weight:bold;
-    }// @grant       GM_addStyle
-
+    }
 
     .badge-local .noOfWords{
     border-left: #63746B solid thin;
@@ -53,8 +80,8 @@ GM_addStyle(`
     border: #63746B solid thin;
     display:inline-block;
     }
+</style>`));
 
-`);
 
 function toInt(n){ return Math.round(Number(n)); }
 
@@ -110,7 +137,7 @@ function addCompletionBadge(){
 
     var badgeTemplate = `
 <span class="badge-local badge-local-${isCompleted ? "completed" :"wip"}">
-  <span class="status">
+  <span class="status">edwin_color_white
 ${isCompleted ? "Completed" :"Work in Progress"}
   </span>
   <span class="noOfWords">
@@ -131,12 +158,18 @@ ${isCompleted ? "Completed" :"Work in Progress"}
 
 (function() {
     'use strict';
+    $('body').addClass("night-mode");
+    $('#content_parent').addClass("night-mode");
+    $('#content_wrapper').addClass("night-mode");
+    $('#storytext').addClass('night-mode');
+    $('#profile_top').addClass('night-mode');
+    $('.lc').addClass('night-mode');
 
-    $('body').css("background-color", "#000");
-    $('#content_parent').css("background-color", "#000");
-    $('#content_wrapper').css("background-color", "#000");
-    $('#storytext').addClass('edwin_color_white');
-    $(' #profile_top').addClass('edwin_color_white');
+    // $('body').css("background-color", "#000");
+    // $('#content_parent').css("background-color", "#000");
+    // $('#content_wrapper').css("background-color", "#000");
+    // $('#storytext').addClass('night-mode');
+    // $('#profile_top').addClass('night-mode');
 
     $(' #profile_top .xgray.xcontrast_txt').addClass("metadata").removeClass('xgray');
 
@@ -417,20 +450,7 @@ function allChapterDoneEDWIN(){
 function createBookmarksBar (){
     var body = $('body');
 
-    var style = $(`<style type='text/css'>
-#bookmarksDiv {position:fixed; background:lightgrey; border: grey thin solid; bottom:10%; right:1%;  min-height: 10%; min-width: 10%; user-select:none !important ; z-index:100;}
-#bookmarksDiv > .title_edwin {padding:5px;  border: grey thin solid; }
-#bookmarksDiv .content_edwin  {padding:2px;}
-#bookmarksDiv .content_edwin .bookmarkItem {    border: grey 2px solid; margin: 2px;}
-#bookmarksDiv .content_edwin .bookmarkItem input {width:85px; cursor:pointer}
-#bookmarksDiv .content_edwin .bookmarkItem span {padding:5px; cursor:pointer}
-#bookmarksDiv .drag_right_edwin {float: right; padding: 0px 2px;}
-.hvr-temp {  display: inline-block;  vertical-align: middle;  -webkit-transform: perspective(1px) translateZ(0);  transform: perspective(1px) translateZ(0);  box-shadow: 0 0 1px transparent;  overflow: hidden;  -webkit-transition-duration: 0.3s;  transition-duration: 0.3s;  -webkit-transition-property: color, background-color, box-shadow;    transition-property: color, background-color,  box-shadow;}
-.hvr-temp:hover, .hvr-temp:focus, .hvr-temp:active {  background-color: #2098D1;  color: white;  box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);}
-.bookmark-tag {    color: cornsilk;    position: absolute;   background-color: seagreen;    padding: 5px;    z-index: 0;}
-</style>`);
 
-    body.append(style);
 
     var bookmarksDiv = $('<div id="bookmarksDiv" class="draggable"><div class="title_edwin">Bookmarks<span class="drag_right_edwin hvr-temp" onclick="bookmarkItemAdd(event);">+</span></div><div class="content_edwin"></div></div>');
     var contentArray = [];
@@ -552,7 +572,7 @@ function toInt(n){ return Math.round(Number(n)); }
 function bookmarkItemAdd(event) {
     db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
 
-    var ficId = ${ficId };
+    var ficId = ${ficId};
 
     db.fics[ficId].bookmarks.push(["BM-" + toInt(window.pageYOffset), toInt(window.pageYOffset)]);
     localStorage.setItem("FFSaveLocation", JSON.stringify(db));
