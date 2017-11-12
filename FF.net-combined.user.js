@@ -101,56 +101,6 @@ var style = $("<style type='text/css'> .ffne_action{padding-right: 7px; cursor:p
 var db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
 var scrollPoint;
 
-function addButtons() {
-    // Adding buttons
-    res = document.getElementById('f_size');
-    // creating links
-    var node = $('.lc').first();
-    var exportMenu = $('<span id="ffne"><span id="ffne_button" class="xcontrast_txt">fE</span></span>');
-    var exportContainer = $('<span id="ffne_export"></span>');
-    var expAllButton = $('<span href="javascript:" class="ffne_action" id="exportAllButton" title="Show the whole story on one page">Story</span>');
-    exportMenu.append(exportContainer);
-    exportContainer.append(expAllButton);
-    node.append(exportMenu);
-    expAllButton.click(exportChapters);
-    $('#ffne_button').click(function () {
-        var cont = $('#ffne_export');
-        if (cont.hasClass('ffne_hidden')) { cont.removeClass('ffne_hidden'); } else { cont.addClass('ffne_hidden') ;}
-    });
-}
-
-function addCompletionBadge(){
-    var profileTop = $("#profile_top");
-    var storyMetaData = profileTop.find("span.metadata").text();
-    var completedRegEx = /Complete/;
-    var isCompleted = completedRegEx.test(storyMetaData);
-
-    var noOfWords;
-    var wordRegex = /Words: ([\d,]*)/;
-    if (wordRegex.test(storyMetaData) && storyMetaData.match(wordRegex).length == 2){
-        noOfWords = storyMetaData.match(wordRegex)[1];
-    }
-
-    var badgeTemplate = `
-<span class="badge-local badge-local-${isCompleted ? "completed" :"wip"}">
-  <span class="status">
-${isCompleted ? "Completed" :"Work in Progress"}
-  </span>
-  <span class="noOfWords">
-    ${noOfWords}
-  </span>
-</span>
-`;
-    var title = profileTop.find("b");
-    console.log(title);
-    console.log($(badgeTemplate));
-
-    title.after($(badgeTemplate));
-
-
-}
-
-
 
 (function() {
     'use strict';
@@ -264,6 +214,51 @@ ${isCompleted ? "Completed" :"Work in Progress"}
         target.setAttribute('data-y', y);
     }
 })();
+
+function addButtons() {
+    // Adding buttons
+    res = document.getElementById('f_size');
+    // creating links
+    var node = $('.lc').first();
+    var exportMenu = $('<span id="ffne"><span id="ffne_button" class="xcontrast_txt">fE</span></span>');
+    var exportContainer = $('<span id="ffne_export"></span>');
+    var expAllButton = $('<span href="javascript:" class="ffne_action" id="exportAllButton" title="Show the whole story on one page">Story</span>');
+    exportMenu.append(exportContainer);
+    exportContainer.append(expAllButton);
+    node.append(exportMenu);
+    expAllButton.click(exportChapters);
+    $('#ffne_button').click(function () {
+        var cont = $('#ffne_export');
+        if (cont.hasClass('ffne_hidden')) { cont.removeClass('ffne_hidden'); } else { cont.addClass('ffne_hidden') ;}
+    });
+}
+
+function addCompletionBadge(){
+    var profileTop = $("#profile_top");
+    var storyMetaData = profileTop.find("span.metadata").text();
+    var completedRegEx = /Complete/;
+    var isCompleted = completedRegEx.test(storyMetaData);
+
+    var noOfWords;
+    var wordRegex = /Words: ([\d,]*)/;
+    if (wordRegex.test(storyMetaData) && storyMetaData.match(wordRegex).length == 2){
+        noOfWords = storyMetaData.match(wordRegex)[1];
+    }
+
+    var badgeTemplate = `
+        <span class="badge-local badge-local-${isCompleted ? "completed" :"wip"}">
+            <span class="status">
+                ${isCompleted ? "Completed" :"Work in Progress"}
+            </span>
+            <span class="noOfWords">
+                ${noOfWords}
+            </span>
+        </span>
+        `;
+    var title = profileTop.find("b");
+    title.after($(badgeTemplate));
+}
+
 
 //Adding table of contents
 function addIndex() {
