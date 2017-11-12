@@ -17,6 +17,38 @@
 
 GM_addStyle(".edwin_color_white {  color:#fff ;}");
 
+GM_addStyle(`
+.badge-local {
+  margin: 2px;
+  border-radius: 5px;
+}
+.badge-local > *{
+  display:inline-block;
+  padding:2px;
+}
+.badge-local .status{
+  font-weight:bold;
+}
+
+.badge-local .noOfWords{
+  border-left: #63746B solid thin;
+}
+
+.badge-local-completed{
+  background-color: #B2C3B3 ;
+  color:#1E2520;
+  border: #63746B solid thin;
+  display:inline-block;
+}
+
+.badge-local-wip{
+  background-color: #F09090 ;
+  color:#621122;
+  border: #63746B solid thin;
+  display:inline-block;
+}
+
+`);
 
 
 var chapters = [];
@@ -59,20 +91,39 @@ function addButtons() {
 
 function addCompletionBadge(){
     var profileTop = $("#profile_top");
+    var storyMetaData = profileTop.find("span.metadata").text();
+    var completedRegEx = /Complete/;
+    var isCompleted = completedRegEx.test(storyMetaData);
 
-    var metadata = $("span.metadata");
-    console.log(metadata);
-    
+    var noOfWords;
+    var wordRegex = /Words: ([\d,]*)/;
+    if (wordRegex.test(storyMetaData) && storyMetaData.match(wordRegex).length == 2){
+        noOfWords = storyMetaData.match(wordRegex)[1];
+    }
+
+    var badgeTemplate = `
+<span class="badge-local badge-local-${isCompleted ? "completed" :"wip"}">
+  <span class="status">
+${isCompleted ? "Completed" :"Work in Progress"}
+  </span>
+  <span class="noOfWords">
+    ${noOfWords}
+  </span>
+</span>
+`;
+    var title = profileTop.find("b");
+    console.log(title);
+    console.log($(badgeTemplate));
+
+    title.after($(badgeTemplate));
+
+
 }
-
-
 
 
 
 (function() {
     'use strict';
-
-
 
     $('body').css("background-color", "#000");
     $('#content_parent').css("background-color", "#000");
@@ -182,10 +233,7 @@ function addCompletionBadge(){
         target.setAttribute('data-x', x);
         target.setAttribute('data-y', y);
     }
-
-
 })();
-
 
 //Adding table of contents
 function addIndex() {
@@ -261,7 +309,6 @@ function exportChapters(e, start, end) {
             }
         });
     }
-
 }
 // Converting chapters' array into a whole;
 function parseStory(chapters) {
@@ -318,7 +365,6 @@ function getLength() {
     return (numChapters);
 }
 
-
 // This function loads chapters and extracts chapter's number and title
 function loadChapter(num, callback) {
     var replStr = '\/' + String(num) + '\/';
@@ -335,9 +381,6 @@ function loadChapter(num, callback) {
         console.log(e);
     }
 }
-
-
-
 
 function allChapterDoneEDWIN(){
     $(window).scrollTop(scrollPoint);
@@ -361,8 +404,6 @@ function allChapterDoneEDWIN(){
         } else {
             console.log("DATABASE LOST, ERROR");
         }
-
-
     });
 }
 
@@ -370,7 +411,7 @@ function createBookmarksBar (){
     var body = $('body');
 
     var style = $(`<style type='text/css'>
-#bookmarksDiv {position:fixed; background:lightgrey; border: grey thin solid; top:20%; left:1%;  min-height: 10%; min-width: 10%; user-select:none !important ; z-index:100;}
+#bookmarksDiv {position:fixed; background:lightgrey; border: grey thin solid; top:20%; right:1%;  min-height: 10%; min-width: 10%; user-select:none !important ; z-index:100;}
 #bookmarksDiv > .title_edwin {padding:5px;  border: grey thin solid; }
 #bookmarksDiv .content_edwin  {padding:2px;}
 #bookmarksDiv .content_edwin .bookmarkItem {    border: grey 2px solid; margin: 2px;}
@@ -389,8 +430,6 @@ function createBookmarksBar (){
     var url = window.location.href;
     var ficIdRegex= /\/s\/(\d*)/;
     var ficId = url.match(ficIdRegex)[1];
-
-
 
     if(db.fics){
         if(db.fics[ficId]){
@@ -476,7 +515,6 @@ function bookmarkItemClick(event) {
         }
 
     }, 250);
-
 }
 
 
@@ -501,7 +539,6 @@ function bookmarkItemDelete(event) {
 
     localStorage.setItem("FFSaveLocation", JSON.stringify(db));
     event.stopPropagation();
-
 }
 
 
@@ -523,13 +560,8 @@ function bookmarkItemAdd(event) {
 var content = document.querySelector("#bookmarksDiv .content_edwin");
 content.innerHTML = content.innerHTML + node;
     event.stopPropagation();
-
 }
-
-
 
 </script>`);
     body.append(script);
 }
-
-
