@@ -150,7 +150,6 @@ function enhanceStory() {
     exportRest();
 
     var ficName = $('#profile_top > b').text();
-
     if(db.fics[pageId]){
         if("scrollPoint" in db.fics[pageId]){
             scrollPoint = db.fics[pageId].scrollPoint;
