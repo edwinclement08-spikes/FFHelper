@@ -10,34 +10,33 @@
 // @grant         GM_xmlhttpRequest
 // @grant         GM_addStyle
 // @require       http://code.jquery.com/jquery-1.12.4.min.js
-// @require		  http://code.interactjs.io/v1.2.9/interact.js
+// @require       http://code.interactjs.io/v1.2.9/interact.js
 // ==/UserScript==
 
 // Credit
-// FanFictionNavigator (by Andy Scull)  https://greasyfork.org/en/scripts/25670-fanfictionnavigator 
+// FanFictionNavigator (by Andy Scull)  https://greasyfork.org/en/scripts/25670-fanfictionnavigator
 // Fanfiction.net story export script (by Alssn) https://greasyfork.org/en/scripts/6272-fanfiction-net-story-export-script
 
 $("body").append($(`<style>
-    .night-mode {  
+    .night-mode {
         color:#fff ;
         background-color: #000 !important;
     }
-    
     /* Bookmarks Division */
     #bookmarksDiv {
-        position:fixed; 
-        background:lightgrey; 
-        border: grey thin solid; 
-        bottom:10%; right:1%;  
-        min-height: 10%; min-width: 10%; 
-        user-select:none !important; 
+        position:fixed;
+        background:lightgrey;
+        border: grey thin solid;
+        bottom:10%; right:1%;
+        min-height: 10%; min-width: 10%;
+        user-select:none !important;
         z-index:100;
     }
     .bookmark-tag {
-        color: cornsilk;    
-        position: absolute;   
-        background-color: seagreen !important;    
-        padding: 5px;    
+        color: cornsilk;
+        position: absolute;
+        background-color: seagreen !important;
+        padding: 5px;
         z-index: 0;
     }
 
@@ -82,11 +81,11 @@ $("body").append($(`<style>
     }
 
     /* ffnet */
-    .ffne_action {padding-right: 7px; cursor:pointer;} 
-    .ffne_action:hover {} 
-    #ffne_export {} 
-    #ffne {float:right;margin-left: 0.9em;} 
-    #ffne_button {font-size:1.3em;cursor:pointer;line-height: 1em;padding-right: 7px;} 
+    .ffne_action {padding-right: 7px; cursor:pointer;}
+    .ffne_action:hover {}
+    #ffne_export {}
+    #ffne {float:right;margin-left: 0.9em;}
+    #ffne_button {font-size:1.3em;cursor:pointer;line-height: 1em;padding-right: 7px;}
     .ffne_hidden {display:none;}
 </style>`));
 
@@ -95,15 +94,42 @@ function toInt(n){ return Math.round(Number(n)); }
 
 var chapters = [];
 
-var style = $("<style type='text/css'> .ffne_action{padding-right: 7px; cursor:pointer;} .ffne_action:hover{} #ffne_export{ } #ffne{float:right;margin-left: 0.9em;} #ffne_button{font-size:1.3em;cursor:pointer;line-height: 1em;padding-right: 7px;} .ffne_hidden{display:none;}</style>");
-//$('body').append(style);
-
 var db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
 var scrollPoint;
 
+var pageURL = window.location.href;
 
-(function() {
-    'use strict';
+var pageType;
+var pageId;
+
+if (jQuery.isEmptyObject(db)){
+    console.log("Empty DB. First time running?");
+    db = {};
+    db.version = '0.2';
+    db.fics = {};
+    localStorage.setItem("FFSaveLocation", JSON.stringify(db));
+} else {
+    $(function() {
+        'use strict';
+        var pageRE = /http[s]:\/\/www.fanfiction.net\/(s|u)\/(\d*)(.*)/;
+        var pageInfo = pageURL.match(pageRE);
+        if(pageInfo.length > 2) {
+            pageType = pageInfo[1];
+            pageId = pageInfo[2];
+            if(pageInfo[1] === "s") {
+                // Its a story
+                console.log("Story.");
+                enhanceStory();
+            } else if(pageInfo[1] === "u"){
+                // Its a user
+                console.log("User.");
+            }
+        }
+    });
+}
+
+
+function enhanceStory() {
     $('body').addClass("night-mode");
     $('#content_parent').addClass("night-mode");
     $('#content_wrapper').addClass("night-mode");
@@ -121,58 +147,39 @@ var scrollPoint;
     addCompletionBadge();
     //Adding buttons to page;
     addButtons();
-
     exportRest();
-    
 
+    var ficName = $('#profile_top > b').text();
 
-    if (jQuery.isEmptyObject(db)){
-        console.log("Error in finding DB");
-        db = {};
-        db.version = '0.2';
-        db.fics = {};
-        localStorage.setItem("FFSaveLocation", JSON.stringify(db));
-    } else {
-        var url = window.location.href;
-        var ficIdRegex= /\/s\/(\d*)/;
-        var ficId = url.match(ficIdRegex)[1];
-
-        var ficName = $('#profile_top > b').text();
-
-
-        if(db.fics[ficId]){
-            if("scrollPoint" in db.fics[ficId]){
-                scrollPoint = db.fics[ficId].scrollPoint;
-
-            } else {
-                db.fics[ficId].scrollPoint = 0;
-                localStorage.setItem("FFSaveLocation", JSON.stringify(db));
-            }
-            if(!db.fics[ficId].bookmarks){
-                db.fics[ficId].bookmarks = {};
-            }
-            var found = false;
-            var bookmarks = db.fics[ficId].bookmarks;
-            for (let i = 0; i < bookmarks.length; i++) {
-                if (bookmarks[i][0] == "last") {
-                    db.fics[ficId].bookmarks[i][1] = scrollPoint;
-                    found = true;
-                    break;
-                }
-            }
-            if(!found){
-                db.fics[ficId].bookmarks.push(["last", scrollPoint]);
-            }
-            localStorage.setItem("FFSaveLocation", JSON.stringify(db));
+    if(db.fics[pageId]){
+        if("scrollPoint" in db.fics[pageId]){
+            scrollPoint = db.fics[pageId].scrollPoint;
         } else {
-            db.fics[ficId] = {"Name": ficName, "scrollPoint": 0};
+            db.fics[pageId].scrollPoint = 0;
             localStorage.setItem("FFSaveLocation", JSON.stringify(db));
         }
+        if(!db.fics[pageId].bookmarks){
+            db.fics[pageId].bookmarks = {};
+        }
+        var found = false;
+        var bookmarks = db.fics[pageId].bookmarks;
+        for (let i = 0; i < bookmarks.length; i++) {
+            if (bookmarks[i][0] == "last") {
+                db.fics[pageId].bookmarks[i][1] = scrollPoint;
+                found = true;
+                break;
+            }
+        }
+    if(!found){
+            db.fics[pageId].bookmarks.push(["last", scrollPoint]);
+        }
+        localStorage.setItem("FFSaveLocation", JSON.stringify(db));
+    } else {
+        db.fics[pageId] = {"Name": ficName, "scrollPoint": 0};
+        localStorage.setItem("FFSaveLocation", JSON.stringify(db));
     }
 
-
     createBookmarksBar();
-
 
     interact('.draggable')
         .draggable({
@@ -212,7 +219,7 @@ var scrollPoint;
         target.setAttribute('data-x', x);
         target.setAttribute('data-y', y);
     }
-})();
+}
 
 function addButtons() {
     // Adding buttons
@@ -239,7 +246,7 @@ function addCompletionBadge(){
     var isCompleted = completedRegEx.test(storyMetaData);
 
     var noOfWords;
-    var wordRegex = /Words: ([\d,]*)/;
+    var wordRegex = /Words:\ ([\d,]*)/;
     if (wordRegex.test(storyMetaData) && storyMetaData.match(wordRegex).length == 2){
         noOfWords = storyMetaData.match(wordRegex)[1];
     }
@@ -375,7 +382,7 @@ function getChapterName(obj) {
     var select = obj.getElementsByTagName('select')[1].getElementsByTagName('option');
     for (var i = 0; i < select.length; i++) {
         if (select[i].getAttribute('selected') != null) {
-            return (select[i].innerHTML.split(/[. ]{2}/)[1]);
+            return (select[i].innerHTML.split(/[.\ ]{2}/)[1]);
         }
     }
 }
@@ -409,7 +416,6 @@ function loadChapter(num, callback) {
 
 function allChapterDoneEDWIN(){
     $(window).scrollTop(scrollPoint);
-    
     $(document).on('scroll', function(){
         var url = window.location.href;
         var ficIdRegex= /\/s\/(\d*)/;
@@ -565,7 +571,7 @@ function bookmarkItemAdd(event) {
     var node = \`<div class="bookmarkItem" onclick="bookmarkItemClick(event)">
 <input class="BookmarkName" type="text" value="\`+"BM-"+toInt(window.pageYOffset) +\`" readonly="true" ondblclick="editBoxDblClick(event);" onkeydown="editBoxKey(event);" >
 <input class="ScrollPoint" type="number" value="\` +toInt(window.pageYOffset) +\`" readonly="true" ondblclick="editBoxDblClick(event);" onkeydown="editBoxKey(event);">
-<span class="hvr-temp" onclick="bookmarkItemDelete(event);">x</span>
+<span class="hvr-temp" onclick="bookmarkItemDelete(event);">x </span>
 </div>\`;
 
 var content = document.querySelector("#bookmarksDiv .content_edwin");
