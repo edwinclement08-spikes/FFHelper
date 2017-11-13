@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
     * add a hide option to the fics which will hide the fic from ever listing
     * add a sort/filter bar
     * add bookmark tag display 
-    * for Stories; show the completion status with a button to toggle those
     * do the settings at the end of page thingie    
 - Bugs 
     * None
@@ -22,6 +21,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
+* User Page; show the completion badge
+* User and Fiction Page; show the Read/Unread badge
+
 ### Changed
 ### Removed
 

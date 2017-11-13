@@ -59,10 +59,16 @@ $("body").append($(`<style>
 margin: 2px;
 border-radius: 5px;
 }
+
 .badge-local > *{
 display:inline-block;
 padding:2px;
 }
+.z-list .badge-local *{
+padding:1px;
+font-size:13px;
+}
+
 .badge-local .status{
 font-weight:bold;
 }
@@ -84,6 +90,14 @@ color:#621122;
 border: #63746B solid thin;
 display:inline-block;
 }
+
+.badge-local-read-status{
+background-color: #A9A7FF ;
+color:#1E2520;
+border: #63746B solid thin;
+display:inline-block;
+}
+
 
 /* ffnet */
 .ffne_action {padding-right: 7px; cursor:pointer;}
@@ -154,9 +168,8 @@ function generateFic(ficId, ficName) {
         "Name": ficName,
         "scrollPoint": 0,
         "bookmarks": [["last", 0]],
-        "opinion": FIC_BLANK,
-        "completed": FIC_UNREAD
-    }
+        "opinion": FIC_BLANK
+    };
 
     db.fics[ficId] = ficInfo;
     saveDB();
@@ -173,7 +186,7 @@ function enhanceStory() {
     $('.lc').addClass('night-mode');
 
     $("#content_wrapper").css('background-color', 'inherit');
-    $("body").css('background-color', 'inherit');
+    $("body").css('background-color', '');
 
     // add another class so that we can quickly navigate to that afterwords
     $('#profile_top .xgray.xcontrast_txt').addClass("metadata").removeClass('xgray');
@@ -182,8 +195,7 @@ function enhanceStory() {
     _fontastic_change_width(75);
     $("#storytext").css("fontSize", "1.5em");
 
-    // add the badges
-    addCompletionBadge();
+
     //Adding buttons to page;
     addButtons();
     exportRest();
@@ -194,6 +206,7 @@ function enhanceStory() {
     }
 
     scrollPoint = db.fics[pageId].scrollPoint;
+
 
     var found = false;
     var bookmarks = db.fics[pageId].bookmarks;
@@ -229,32 +242,6 @@ function addButtons() {
         var cont = $('#ffne_export');
         if (cont.hasClass('ffne_hidden')) { cont.removeClass('ffne_hidden'); } else { cont.addClass('ffne_hidden'); }
     });
-}
-
-function addCompletionBadge() {
-    var profileTop = $("#profile_top");
-    var storyMetaData = profileTop.find("span.metadata").text();
-    var completedRegEx = /Complete/;
-    var isCompleted = completedRegEx.test(storyMetaData);
-
-    var noOfWords;
-    var wordRegex = /Words:\s([\d,]*)/;
-    if (wordRegex.test(storyMetaData) && storyMetaData.match(wordRegex).length == 2) {
-        noOfWords = storyMetaData.match(wordRegex)[1];
-    }
-
-    var badgeTemplate = `
-    <span class="badge-local badge-local-${isCompleted ? "completed" : "wip"}">
-        <span class="status">
-            ${isCompleted ? "Completed" : "Work in Progress"}
-        </span>
-        <span class="noOfWords">
-            ${noOfWords}
-        </span>
-    </span>
-    `;
-    var title = profileTop.find("b");
-    title.after($(badgeTemplate));
 }
 
 
@@ -299,8 +286,8 @@ function exportRest(e) {
         allChapterDoneEDWIN();
         logger.log("It's a single Chapter fic ");
     }
-
 }
+
 function exportChapters(e, start, end) {
     // Main actions
     // Progress indicator
@@ -337,6 +324,7 @@ function exportChapters(e, start, end) {
         });
     }
 }
+
 // Converting chapters' array into a whole;
 function parseStory(chapters) {
     var numCh = chapters.length;
@@ -421,6 +409,15 @@ function allChapterDoneEDWIN() {
             }
         }
     });
+
+    // get maximum scrollable position and set it
+    // if not set, the "read" badge won't appear
+    var limit = Math.max( document.body.scrollHeight, document.body.offsetHeight,
+        document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight );
+    db.fics[pageId].maxScroll = limit;
+    saveDB();
+
+
 }
 function createBookmarksDiv() {
     new BookmarksDivHandler();
@@ -632,7 +629,8 @@ function enhanceUser() {
 
     $("#content_wrapper_inner a").addClass("link_colored");
 
-    $("div.mystories").find(".z-indent.z-padtop .z-padtop2 ").removeClass("xgray")
+    $("div.mystories").find(".z-indent.z-padtop .z-padtop2 ").removeClass("xgray").addClass("metadata");
+
 
 }
 
@@ -770,7 +768,7 @@ class Story {
             generateFic(this.pageId, this.ficName);
         }
 
-        if (!jQuery.isEmptyObject(db.fics[this.pageId]) && "opinion" in db.fics[this.pageId] && "completed" in db.fics[this.pageId]) {
+        if (!jQuery.isEmptyObject(db.fics[this.pageId]) && "opinion" in db.fics[this.pageId]) {
             // Show those info
             switch (db.fics[this.pageId].opinion) {
                 case FIC_LIKED:
@@ -790,14 +788,16 @@ class Story {
                     this.removeOtherClasses();
             }
 
-            // TODO do something with that completed option
 
         } else {
             // Initialize it
             db.fics[this.pageId].opinion = FIC_BLANK;
-            db.fics[this.pageId].completed = FIC_UNREAD;
             saveDB();
         }
+
+        // add the badges
+        this.addCompletionBadge();
+        this.addReadBadge();
     }
     addActions() {
         var buttonBar = this.storyElem.find('.new_like_actions');
@@ -856,5 +856,58 @@ class Story {
     }
     removeOtherClasses(){
         this.storyElem.removeClass("ffn_like ffn_dislike ffn_mark ffn_calibre");
+    }
+
+    getBadge(type, primary, secondary) {
+        return `
+        <span class="badge-local badge-local-${type}">
+            <span class="status">
+                ${primary}
+            </span>
+            <span class="noOfWords">
+                ${secondary}
+            </span>
+        </span>
+        `;
+    }
+
+    getTitle()  {
+        var title = this.storyElem.find("b");
+
+        if (title.length == 0) {
+            title = this.storyElem.find("a.stitle");
+        }
+        return title
+    }
+
+    addCompletionBadge() {
+        var storyMetaData = this.storyElem.find(".metadata").text();
+        var completedRegEx = /Complete/;
+        var isCompleted = completedRegEx.test(storyMetaData);
+
+        var noOfWords;
+        var wordRegex = /Words:\s([\d,]*)/;
+        if (wordRegex.test(storyMetaData) && storyMetaData.match(wordRegex).length == 2) {
+            noOfWords = storyMetaData.match(wordRegex)[1];
+        }
+
+        var completionBadge = this.getBadge((isCompleted ? "completed" : "wip"), (isCompleted ? "Completed" : "Work in Progress"), noOfWords);
+
+        var title = this.getTitle();
+        title.after($(completionBadge));
+    }
+
+    addReadBadge() {
+        if(db.fics[this.pageId]){
+            if(db.fics[this.pageId].maxScroll)   {
+                var readVal = toInt(db.fics[this.pageId].scrollPoint / db.fics[this.pageId].maxScroll * 100);
+                var ReadBadge = this.getBadge("read-status",
+                (readVal > 95) ? "Read" : "Unread",
+                readVal);
+
+                var title = this.getTitle();
+                title.after($(ReadBadge));
+            }
+        }        
     }
 }
