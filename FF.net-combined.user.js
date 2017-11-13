@@ -1,5 +1,5 @@
 // ==UserScript==
-// @version       0.6
+// @version       0.7
 // @include       *.fanfiction.net/s/*
 // @include       *.fanfiction.net/u/*
 // @namespace     tag:edwinclement08@gmail.com,2017-10-08:FFnetHelper
@@ -10,6 +10,7 @@
 // @grant         GM_xmlhttpRequest
 // @grant         GM_addStyle
 // @require       http://code.jquery.com/jquery-1.12.4.min.js
+// @require     https://greasyfork.org/scripts/17419-underscore-js-1-8-3/code/Underscorejs%20183.js?version=109803
 // ==/UserScript==
 
 // Credit
@@ -110,7 +111,6 @@ function loadDB() {
     db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
 }
 
-
 var chapters = [];
 var db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
 var scrollPoint;
@@ -126,35 +126,43 @@ if (jQuery.isEmptyObject(db)) {
     db.version = '0.2';
     db.fics = {};
     localStorage.setItem("FFSaveLocation", JSON.stringify(db));
-} else {
-    $(function () {
-        'use strict';
-        var pageRE = /http[s]:\/\/www.fanfiction.net\/(s|u)\/(\d*)(.*)/;
-        var pageInfo = pageURL.match(pageRE);
-        if (pageInfo.length > 2) {
-            pageType = pageInfo[1];
-            pageId = pageInfo[2];
-            if (pageInfo[1] === "s") {
-                // Its a story
-                logger.log("Story Detected.");
-                enhanceStory();
-            } else if (pageInfo[1] === "u") {
-                // Its a user
-                logger.log("User Detected.");
-                enhanceUser();
-            }
+}
+
+$(function () {
+    'use strict';
+    var pageRE = /http[s]:\/\/www.fanfiction.net\/(s|u)\/(\d*)(.*)/;
+    var pageInfo = pageURL.match(pageRE);
+    if (pageInfo.length > 2) {
+        pageType = pageInfo[1];
+        pageId = pageInfo[2];
+        if (pageInfo[1] === "s") {
+            // Its a story
+            logger.log("Story Detected.");
+            enhanceStory();
+        } else if (pageInfo[1] === "u") {
+            // Its a user
+            logger.log("User Detected.");
+            enhanceUser();
         }
-    });
+        enhanceBoth();
+    }
+});
+
+function generateFic(ficId, ficName) {
+    loadDB();
+    var ficInfo = {
+        "Name": ficName,
+        "scrollPoint": 0,
+        "bookmarks": [["last", 0]],
+        "opinion": FIC_BLANK,
+        "completed": FIC_UNREAD
+    }
+
+    db.fics[ficId] = ficInfo;
+    saveDB();
+    logger.log(["NEW FIC GEN", db.fics[ficId]]);
 }
 
-function enhanceUser() {
-    $('body').addClass("night-mode");
-    $("body")[0].style = "margin-top: 0px;";
-    $("#content_wrapper").css('background-color', 'inherit');
-    $("#content_wrapper_inner a").css('color', '#79a00f');
-
-    // TODO s
-}
 
 function enhanceStory() {
     $('body').addClass("night-mode");
@@ -181,39 +189,26 @@ function enhanceStory() {
     exportRest();
 
     var ficName = $('#profile_top > b').text();
-    if (!db.fics[pageId])  {
-        db.fics[pageId] = { "Name": ficName, "scrollPoint": 0 };
-        saveDB();
+    if (!db.fics[pageId]) {
+        generateFic(pageId, ficName);
     }
 
-    // if (db.fics[pageId]) {
-    //     if ("scrollPoint" in db.fics[pageId]) {
-    //         scrollPoint = db.fics[pageId].scrollPoint;
-    //     } else {
-    //         db.fics[pageId].scrollPoint = 0;
-    //         localStorage.setItem("FFSaveLocation", JSON.stringify(db));
-    //     }
-    //     if (!db.fics[pageId].bookmarks) {
-    //         db.fics[pageId].bookmarks = {};
-    //     }
-    //     var found = false;
-    //     var bookmarks = db.fics[pageId].bookmarks;
+    scrollPoint = db.fics[pageId].scrollPoint;
 
-    //     for(let i = 0; i < bookmarks.length; i++) {
-    //         if (bookmarks[i][0] == "last") {
-    //             db.fics[pageId].bookmarks[i][1] = scrollPoint;
-    //             found = true;
-    //             break;
-    //         }
-    //     }
-    //     if (!found) {
-    //         db.fics[pageId].bookmarks.push(["last", scrollPoint]);
-    //     }
-    //     localStorage.setItem("FFSaveLocation", JSON.stringify(db));
-    // } else {
-    //     db.fics[pageId] = { "Name": ficName, "scrollPoint": 0 };
-    //     localStorage.setItem("FFSaveLocation", JSON.stringify(db));
-    // }
+    var found = false;
+    var bookmarks = db.fics[pageId].bookmarks;
+
+    for(let i = 0; i < bookmarks.length; i++) {
+        if (bookmarks[i][0] == "last") {
+            db.fics[pageId].bookmarks[i][1] = scrollPoint;
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        db.fics[pageId].bookmarks.push(["last", scrollPoint]);
+    }
+    saveDB();
 
     createBookmarksDiv();
 }
@@ -265,21 +260,21 @@ function addCompletionBadge() {
 
 //Adding table of contents
 function addIndex() {
-    var chapters = $('div[name="ffnee_chapter"]');
+    var _chapters = $('div[name="ffnee_chapter"]');
     var index = $('<div id="ffnee_index"><h2>Table of contents</h2></div>');
     var toC = $('<ol></ol>');
     index.append(toC);
-    for (let i = 0; i < chapters.length; i++) {
-        var item = $(chapters[i]); //chapter we are currently processing
+    for (let i = 0; i < _chapters.length; i++) {
+        var item = $(_chapters[i]); //chapter we are currently processing
         toC.append($('<li><a href="#' + item.attr('id') + '">' + item.attr('title') + '</a></li>'));
     }
     $('#storytext').prepend(index);
 }
 //adding headers, as entered by author
 function addHeaders() {
-    var chapters = document.getElementsByName('ffnee_chapter');
-    for (var i = 0; i < chapters.length; i++) {
-        var item = chapters.item(i); //chapter to which we are adding a header
+    var _chapters = document.getElementsByName('ffnee_chapter');
+    for (let i = 0; i < _chapters.length; i++) {
+        var item = _chapters.item(i); //chapter to which we are adding a header
         var header = document.createElement('p');
         header.innerHTML = '<h2>Chapter ' + (i + 1) + ': ' + item.getAttribute('title') + '</h2>';
         item.insertBefore(header, item.firstChild);
@@ -298,7 +293,13 @@ function addTitle() {
 function exportRest(e) {
     var chap_select = document.getElementById('chap_select');
 
-    exportChapters(e, chap_select.value - 1);
+    if (chap_select)
+        exportChapters(e, chap_select.value - 1);
+    else    {
+        allChapterDoneEDWIN();
+        logger.log("It's a single Chapter fic ");
+    }
+
 }
 function exportChapters(e, start, end) {
     // Main actions
@@ -412,17 +413,11 @@ function loadChapter(num, callback) {
 function allChapterDoneEDWIN() {
     $(window).scrollTop(scrollPoint);
     $(document).on('scroll', function () {
-
         if (db.fics) {
             if (db.fics[pageId]) {
-                db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
+                loadDB();
                 db.fics[pageId].scrollPoint = window.pageYOffset;
-                localStorage.setItem("FFSaveLocation", JSON.stringify(db));
-            } else {
-                var ficName = $('#profile_top > b').text();
-                db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
-                db.fics[pageId] = { "Name": ficName, "scrollPoint": window.pageYOffset };
-                localStorage.setItem("FFSaveLocation", JSON.stringify(db));
+                saveDB();
             }
         }
     });
@@ -450,7 +445,6 @@ function createBookmarksDiv() {
     }
 }
 
-
 class BookmarksDivHandler {
     constructor() {
         var bookmarksDivNode = $(
@@ -470,6 +464,7 @@ class BookmarksDivHandler {
 
         if (db.fics[pageId] && !db.fics[pageId].bookmarks) {
             db.fics[pageId].bookmarks = [["last", db.fics[pageId].scrollPoint]];
+            logger.log("BookmarksDivHandler :: no save area found on init")
             saveDB();
         }
 
@@ -559,7 +554,7 @@ class BookmarksDivHandler {
                         }
                     }
 
-                    if(!found)  {
+                    if (!found) {
                         db.fics[pageId].bookmarks.push(["BM-" + toInt(window.pageYOffset), toInt(window.pageYOffset)]);
                     }
 
@@ -629,3 +624,237 @@ class BookmarksDivHandler {
     }
 }
 
+
+function enhanceUser() {
+    $('body').addClass("night-mode");
+    $("body")[0].style = "margin-top: 0px;";
+    $("#content_wrapper").css('background-color', 'inherit');
+
+    $("#content_wrapper_inner a").addClass("link_colored");
+
+    $("div.mystories").find(".z-indent.z-padtop .z-padtop2 ").removeClass("xgray")
+
+}
+
+// Fics:
+const FIC_LIKED = 0;
+const FIC_DISLIKED = 1;
+const FIC_MARKED = 2;
+const FIC_CALIBRE = 3;
+const FIC_BLANK = -1;
+
+// Read Complete:
+const FIC_READ = 1;
+const FIC_UNREAD = 0;
+
+// Colors. now used for like/dislike/etc links
+const COLOR_LIKED = '#C4FFCA';
+const COLOR_DISLIKED = '#FCB0B0';
+const COLOR_MARKED = '#8F8F8F';
+const COLOR_CALIBRE = '#F1D173';
+const COLOR_CLEARED = '#FFF';
+
+
+$("body").append($(`<style>
+
+#content_wrapper_inner .link_colored {color: #79a00f;}
+#content_wrapper_inner  .ffn_like  .link_colored    {color: rgb(96, 0, 255);    }
+#content_wrapper_inner .ffn_dislike .link_colored  {color: rgb(114, 6, 6);}
+#content_wrapper_inner  .ffn_mark .link_colored {color: rgb(95, 0, 0);}
+#content_wrapper_inner  .ffn_calibre .link_colored  {color: rgb(95, 0, 0);}
+
+
+span.ffn_like     {}
+span.ffn_mark     {}
+span.ffn_calibre  {}
+span.ffn_dislike  { text-decoration: line-through; font-weight: bold; }
+.ffn_like      { background-color:${COLOR_LIKED}    !important; color:black !important; }
+.ffn_dislike   { background-color:${COLOR_DISLIKED} !important; color:black !important; }
+.ffn_mark      { background-color:${COLOR_MARKED}   !important; color:black !important; }
+.ffn_calibre   { background-color:${COLOR_CALIBRE}  !important; color:black !important; }
+
+.ffh_buttons    {
+    padding         : 1px;
+    border-radius   : 2px;
+    margin-right    : 4px;
+    cursor          : pointer;
+    border          : thin black solid;
+}
+.ffh_buttons  span{
+    color           : black;
+}
+
+.like_story  {
+    background-color: ${COLOR_LIKED};
+}
+.dislike_story   {
+    background-color: ${COLOR_DISLIKED};
+}
+.mark_story  {
+    background-color: ${COLOR_MARKED};
+}
+.calibre_story   {
+    background-color: ${COLOR_CALIBRE};
+}
+.clear_story {
+    background-color: ${COLOR_CLEARED};
+}
+.new_like_actions {
+    margin:0px 0px 0px 20px;
+    font-size:11px;
+    padding: 5px;
+}
+
+#profile_top, .z-list   {
+    padding: 4px;
+    border: thin solid black;
+    border-radius: 5px;
+}
+</style>`));
+
+function enhanceBoth() {
+    $(".z-list").each(function () {
+        var story = new Story({ instance: this });
+        // app.collection.push(story);
+    });
+
+    // links on reading page
+    $("div#profile_top").each(function () {
+        var story = new Story({ instance: this });
+        // app.collection.push(story);
+    });
+
+    // hide/show options
+    $('div#content_wrapper_inner').after(
+        '<div class="liker_script_options" style="padding:5px; border:1px solid #333399; margin-bottom:5px; background:#D8D8FF;">' +
+        '<b>Liker Options:</b> ' +
+        '</div>'
+    );
+}
+
+class Story {
+    constructor(options) {
+        this.storyElem = $(options.instance);
+        var titleLink_UserPage = this.storyElem.find(".stitle").attr("href");
+        this.template = $(`
+        <div class="new_like_actions">
+            Story:
+            <span href="" class="ffh_buttons like_story">      <span>Like     </span></span>
+            <span href="" class="ffh_buttons dislike_story">   <span>Dislike  </span></span>
+            <span href="" class="ffh_buttons mark_story">      <span>Mark     </span></span>
+            <span href="" class="ffh_buttons calibre_story">   <span>Calibre  </span></span>
+            <span href="" class="ffh_buttons clear_story">     <span>Clear    </span></span>
+        </div>`);
+        this.storyElem.append(this.template);
+
+        this.addActions();
+
+        try {
+            if (titleLink_UserPage) {
+                // its a UserPage
+                this.pageId = this.storyElem.find(".stitle").attr("href").match(/\/s\/(\d*)/)[1];
+                this.ficName = this.storyElem.find(".stitle").text();
+            } else {
+                // its a storyPage
+                this.pageId = this.storyElem.find("span.xcontrast_txt > a").get(1).href.match(/.*\/r\/(\d*)/)[1];
+                this.ficName = this.storyElem.find("b.xcontrast_txt").text();
+            }
+        }
+        catch (e) {
+            // statements to handle any exceptions
+            alert("Can't find the ficId"); ``
+            logger.log("Error: Can't find the ficId");
+        }
+
+        if (!db.fics[this.pageId] || jQuery.isEmptyObject(db.fics[this.pageId])) {
+            generateFic(this.pageId, this.ficName);
+        }
+
+        if (!jQuery.isEmptyObject(db.fics[this.pageId]) && "opinion" in db.fics[this.pageId] && "completed" in db.fics[this.pageId]) {
+            // Show those info
+            switch (db.fics[this.pageId].opinion) {
+                case FIC_LIKED:
+                    this.like();
+                    break;
+                case FIC_DISLIKED:
+                    this.dislike();
+                    break;
+                case FIC_MARKED:
+                    this.mark();
+                    break;
+                case FIC_CALIBRE:
+                    this.calibre();
+                    break;
+                case FIC_BLANK:
+                default:
+                    this.removeOtherClasses();
+            }
+
+            // TODO do something with that completed option
+
+        } else {
+            // Initialize it
+            db.fics[this.pageId].opinion = FIC_BLANK;
+            db.fics[this.pageId].completed = FIC_UNREAD;
+            saveDB();
+        }
+    }
+    addActions() {
+        var buttonBar = this.storyElem.find('.new_like_actions');
+
+        buttonBar.find('.like_story').click(this.like.bind(this));
+        buttonBar.find('.dislike_story').click(this.dislike.bind(this));
+        buttonBar.find('.mark_story').click(this.mark.bind(this));
+        buttonBar.find('.calibre_story').click(this.calibre.bind(this));
+        buttonBar.find('.clear_story').click(this.clear.bind(this));
+    }
+
+    saveFic() {
+        saveDB();
+    }
+
+    loadFic() {
+        loadDB();
+    }
+
+    like() {
+        this.loadFic();
+        this.removeOtherClasses();
+        this.storyElem.addClass("ffn_like");
+
+        db.fics[this.pageId].opinion = FIC_LIKED;
+        this.saveFic();
+    }
+
+    dislike() {
+        this.loadFic();
+        this.removeOtherClasses();
+        this.storyElem.addClass("ffn_dislike");
+
+        db.fics[this.pageId].opinion = FIC_DISLIKED ;
+        this.saveFic();
+    }
+    mark() {
+        this.loadFic();
+        this.removeOtherClasses();
+        this.storyElem.addClass("ffn_mark");
+        db.fics[this.pageId].opinion = FIC_MARKED ;
+        this.saveFic();
+    }
+    calibre() {
+        this.loadFic();
+        this.removeOtherClasses();
+        this.storyElem.addClass("ffn_calibre");
+        db.fics[this.pageId].opinion = FIC_CALIBRE ;
+        this.saveFic();
+    }
+    clear() {
+        this.loadFic();
+        this.removeOtherClasses();
+        db.fics[this.pageId].opinion = FIC_BLANK ;
+        this.saveFic();
+    }
+    removeOtherClasses(){
+        this.storyElem.removeClass("ffn_like ffn_dislike ffn_mark ffn_calibre");
+    }
+}
