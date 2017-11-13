@@ -17,80 +17,80 @@
 // Fanfiction.net story export script (by Alssn) https://greasyfork.org/en/scripts/6272-fanfiction-net-story-export-script
 
 $("body").append($(`<style>
-    .night-mode {
-        color:#fff ;
-        background-color: #000;
-    }
+.night-mode {
+    color:#fff ;
+    background-color: #000;
+}
 
-    /* Bookmarks Division */
-    #bookmarksDiv {
-        position:fixed;
-        background:lightgrey;
-        border: grey thin solid;
-        top:75%; left:80%;
-        min-height: 10%; min-width: 10%;
-        user-select:none !important;
-        z-index:100;
-    }
-    .bookmark-tag {
-        color: cornsilk;
-        position: absolute;
-        background-color: seagreen !important;
-        padding: 5px;
-        z-index: 0;
-    }
+/* Bookmarks Division */
+#bookmarksDiv {
+    position:fixed;
+    background:lightgrey;
+    border: grey thin solid;
+    top:75%; left:80%;
+    min-height: 10%; min-width: 10%;
+    user-select:none !important;
+    z-index:100;
+}
+.bookmark-tag {
+    color: cornsilk;
+    position: absolute;
+    background-color: seagreen !important;
+    padding: 5px;
+    z-index: 0;
+}
 
-    #bookmarksDiv > .title_edwin                        {padding:5px; border: grey thin solid; }
-    #bookmarksDiv .content_edwin                        {padding:2px;}
-    #bookmarksDiv .content_edwin .#content_wrapperbookmarkItem          {border: grey 2px solid; margin: 2px;}
-    #bookmarksDiv .content_edwin .bookmarkItem input    {width:85px; cursor:pointer}
-    #bookmarksDiv .content_edwin .bookmarkItem span     {padding:5px; cursor:pointer}
-    #bookmarksDiv .drag_right_edwin                     {float: right; padding: 0px 2px;}
-    .hvr-temp {  display: inline-block;  vertical-align: middle;  -webkit-transform: perspective(1px) translateZ(0);  transform: perspective(1px) translateZ(0);  box-shadow: 0 0 1px transparent;  overflow: hidden;  -webkit-transition-duration: 0.3s;  transition-duration: 0.3s;  -webkit-transition-property: color, background-color, box-shadow;    transition-property: color, background-color,  box-shadow;}
-    .hvr-temp:hover, .hvr-temp:focus, .hvr-temp:active {  background-color: #2098D1;  color: white;  box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);}
+#bookmarksDiv > .title_edwin                        {padding:5px; border: grey thin solid; color: black; user-select:none !important;}
+#bookmarksDiv .content_edwin                        {padding:2px;}
+#bookmarksDiv .content_edwin .#content_wrapperbookmarkItem          {border: grey 2px solid; margin: 2px;}
+#bookmarksDiv .content_edwin .bookmarkItem input    {width:85px; cursor:pointer}
+#bookmarksDiv .content_edwin .bookmarkItem span     {padding:5px; cursor:pointer}
+#bookmarksDiv .drag_right_edwin                     {float: right; padding: 0px 2px;}
+.hvr-temp {  display: inline-block;  vertical-align: middle;  -webkit-transform: perspective(1px) translateZ(0);  transform: perspective(1px) translateZ(0);  box-shadow: 0 0 1px transparent;  overflow: hidden;  -webkit-transition-duration: 0.3s;  transition-duration: 0.3s;  -webkit-transition-property: color, background-color, box-shadow;    transition-property: color, background-color,  box-shadow;}
+.hvr-temp:hover, .hvr-temp:focus, .hvr-temp:active {  background-color: #2098D1;  color: white;  box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);}
 
-    /* Badges */
-    .badge-local {
-    margin: 2px;
-    border-radius: 5px;
-    }
-    .badge-local > *{
-    display:inline-block;
-    padding:2px;
-    }
-    .badge-local .status{
-    font-weight:bold;
-    } 
+/* Badges */
+.badge-local {
+margin: 2px;
+border-radius: 5px;
+}
+.badge-local > *{
+display:inline-block;
+padding:2px;
+}
+.badge-local .status{
+font-weight:bold;
+} 
 
-    .badge-local .noOfWords{
-    border-left: #63746B solid thin;
-    }
+.badge-local .noOfWords{
+border-left: #63746B solid thin;
+}
 
-    .badge-local-completed{
-    background-color: #B2C3B3 ;
-    color:#1E2520;
-    border: #63746B solid thin;
-    display:inline-block;
-    }
+.badge-local-completed{
+background-color: #B2C3B3 ;
+color:#1E2520;
+border: #63746B solid thin;
+display:inline-block;
+}
 
-    .badge-local-wip{
-    background-color: #F09090 ;
-    color:#621122;
-    border: #63746B solid thin;
-    display:inline-block;
-    }
+.badge-local-wip{
+background-color: #F09090 ;
+color:#621122;
+border: #63746B solid thin;
+display:inline-block;
+}
 
-    /* ffnet */
-    .ffne_action {padding-right: 7px; cursor:pointer;}
-    .ffne_action:hover {}
-    #ffne_export {}
-    #ffne {float:right;margin-left: 0.9em;}
-    #ffne_button {font-size:1.3em;cursor:pointer;line-height: 1em;padding-right: 7px;}
-    .ffne_hidden {display:none;}
+/* ffnet */
+.ffne_action {padding-right: 7px; cursor:pointer;}
+.ffne_action:hover {}
+#ffne_export {}
+#ffne {float:right;margin-left: 0.9em;}
+#ffne_button {font-size:1.3em;cursor:pointer;line-height: 1em;padding-right: 7px;}
+.ffne_hidden {display:none;}
 </style>`));
 
 
-function toInt(n){ return Math.round(Number(n)); }
+function toInt(n) { return Math.round(Number(n)); }
 
 var chapters = [];
 
@@ -104,25 +104,25 @@ var pageId;
 
 var x_pos = 0, y_pos = 0;
 
-if (jQuery.isEmptyObject(db)){
+if (jQuery.isEmptyObject(db)) {
     console.log("Empty DB. First time running?");
     db = {};
     db.version = '0.2';
     db.fics = {};
     localStorage.setItem("FFSaveLocation", JSON.stringify(db));
 } else {
-    $(function() {
+    $(function () {
         'use strict';
         var pageRE = /http[s]:\/\/www.fanfiction.net\/(s|u)\/(\d*)(.*)/;
         var pageInfo = pageURL.match(pageRE);
-        if(pageInfo.length > 2) {
+        if (pageInfo.length > 2) {
             pageType = pageInfo[1];
             pageId = pageInfo[2];
-            if(pageInfo[1] === "s") {
+            if (pageInfo[1] === "s") {
                 // Its a story
                 console.log("Story.");
                 enhanceStory();
-            } else if(pageInfo[1] === "u"){
+            } else if (pageInfo[1] === "u") {
                 // Its a user
                 console.log("User.");
                 enhanceUser();
@@ -131,7 +131,7 @@ if (jQuery.isEmptyObject(db)){
     });
 }
 
-function enhanceUser(){
+function enhanceUser() {
     $('body').addClass("night-mode");
     $("body")[0].style = "margin-top: 0px;";
 
@@ -156,7 +156,7 @@ function enhanceStory() {
 
     // set default width and font size
     _fontastic_change_width(75);
-    $("#storytext").css("fontSize",  "1.5em");
+    $("#storytext").css("fontSize", "1.5em");
 
     // add the badges
     addCompletionBadge();
@@ -165,14 +165,14 @@ function enhanceStory() {
     exportRest();
 
     var ficName = $('#profile_top > b').text();
-    if(db.fics[pageId]){
-        if("scrollPoint" in db.fics[pageId]){
+    if (db.fics[pageId]) {
+        if ("scrollPoint" in db.fics[pageId]) {
             scrollPoint = db.fics[pageId].scrollPoint;
         } else {
             db.fics[pageId].scrollPoint = 0;
             localStorage.setItem("FFSaveLocation", JSON.stringify(db));
         }
-        if(!db.fics[pageId].bookmarks){
+        if (!db.fics[pageId].bookmarks) {
             db.fics[pageId].bookmarks = {};
         }
         var found = false;
@@ -184,12 +184,12 @@ function enhanceStory() {
                 break;
             }
         }
-    if(!found){
+        if (!found) {
             db.fics[pageId].bookmarks.push(["last", scrollPoint]);
         }
         localStorage.setItem("FFSaveLocation", JSON.stringify(db));
     } else {
-        db.fics[pageId] = {"Name": ficName, "scrollPoint": 0};
+        db.fics[pageId] = { "Name": ficName, "scrollPoint": 0 };
         localStorage.setItem("FFSaveLocation", JSON.stringify(db));
     }
 
@@ -210,11 +210,11 @@ function addButtons() {
     expAllButton.click(exportChapters);
     $('#ffne_button').click(function () {
         var cont = $('#ffne_export');
-        if (cont.hasClass('ffne_hidden')) { cont.removeClass('ffne_hidden'); } else { cont.addClass('ffne_hidden') ;}
+        if (cont.hasClass('ffne_hidden')) { cont.removeClass('ffne_hidden'); } else { cont.addClass('ffne_hidden'); }
     });
 }
 
-function addCompletionBadge(){
+function addCompletionBadge() {
     var profileTop = $("#profile_top");
     var storyMetaData = profileTop.find("span.metadata").text();
     var completedRegEx = /Complete/;
@@ -222,20 +222,20 @@ function addCompletionBadge(){
 
     var noOfWords;
     var wordRegex = /Words:\ ([\d,]*)/;
-    if (wordRegex.test(storyMetaData) && storyMetaData.match(wordRegex).length == 2){
+    if (wordRegex.test(storyMetaData) && storyMetaData.match(wordRegex).length == 2) {
         noOfWords = storyMetaData.match(wordRegex)[1];
     }
 
     var badgeTemplate = `
-        <span class="badge-local badge-local-${isCompleted ? "completed" :"wip"}">
-            <span class="status">
-                ${isCompleted ? "Completed" :"Work in Progress"}
-            </span>
-            <span class="noOfWords">
-                ${noOfWords}
-            </span>
+    <span class="badge-local badge-local-${isCompleted ? "completed" : "wip"}">
+        <span class="status">
+            ${isCompleted ? "Completed" : "Work in Progress"}
         </span>
-        `;
+        <span class="noOfWords">
+            ${noOfWords}
+        </span>
+    </span>
+    `;
     var title = profileTop.find("b");
     title.after($(badgeTemplate));
 }
@@ -387,22 +387,22 @@ function loadChapter(num, callback) {
     }
 }
 
-function allChapterDoneEDWIN(){
+function allChapterDoneEDWIN() {
     $(window).scrollTop(scrollPoint);
-    $(document).on('scroll', function(){
+    $(document).on('scroll', function () {
         var url = window.location.href;
-        var ficIdRegex= /\/s\/(\d*)/;
+        var ficIdRegex = /\/s\/(\d*)/;
         var ficId = url.match(ficIdRegex)[1];
 
-        if(db.fics){
-            if(db.fics[ficId]){
+        if (db.fics) {
+            if (db.fics[ficId]) {
                 db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
                 db.fics[ficId].scrollPoint = window.pageYOffset;
                 localStorage.setItem("FFSaveLocation", JSON.stringify(db));
             } else {
                 var ficName = $('#profile_top > b').text();
                 db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
-                db.fics[ficId] = {"Name": ficName, "scrollPoint": window.pageYOffset};
+                db.fics[ficId] = { "Name": ficName, "scrollPoint": window.pageYOffset };
                 localStorage.setItem("FFSaveLocation", JSON.stringify(db));
             }
         } else {
@@ -410,179 +410,247 @@ function allChapterDoneEDWIN(){
         }
     });
 }
+function createBookmarksDiv() {
+    new BookmarksDivHandler();
 
-function createBookmarksDiv (){
-    var body = $('body');
-
-    var bookmarksDiv = $('<div id="bookmarksDiv" class="draggable"><div class="title_edwin">Bookmarks<span class="drag_right_edwin hvr-temp" onclick="bookmarkItemAdd(event);">+</span></div><div class="content_edwin"></div></div>');
-    var contentArray = [];
-    var url = window.location.href;
-    var ficIdRegex= /\/s\/(\d*)/;
-    var ficId = url.match(ficIdRegex)[1];
-
-    if(db.fics){
-        if(db.fics[ficId]){
-            db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
-            var bookmarks = db.fics[ficId].bookmarks;
-            if(bookmarks){
-                for(let i = 0; i < bookmarks.length;i++){
-                    var bookmarkNo = i;
-
-                    var node = `<div class="bookmarkItem" onclick="bookmarkItemClick(event)">
-<input class="BookmarkName" type="text" value="${bookmarks[i][0]}" readonly="true" ondblclick="editBoxDblClick(event);" onkeydown="editBoxKey(event);" >
-<input class="ScrollPoint" type="number" value="${toInt(bookmarks[i][1])}" readonly="true" ondblclick="editBoxDblClick(event);" onkeydown="editBoxKey(event);">
-<span class="hvr-temp" onclick="bookmarkItemDelete(event);">x</span>
-</div>`;
-                    var tag = `<div class="bookmark-tag" style="top:${bookmarks[i][1] + 30}px"><b>${bookmarks[i][0]}</b></div>`;
-                    body.prepend(tag);
-                    contentArray.push(node);
-                }
-                //localStorage.setItem("FFSaveLocation", JSON.stdraggableringify(db));
-            } else {
-                db.fics[ficId].bookmarks = [["last", db.fics[ficId].scrollPoint]];
-                localStorage.setItem("FFSaveLocation", JSON.stringify(db));
-            }
-        }
-    }
-    var allBookmarks = $(contentArray.join(""));
-    body.prepend(bookmarksDiv);
-    $("#bookmarksDiv .content_edwin").append(allBookmarks);
-
+    // Add Drag system
     document.getElementsByClassName('draggable')[0].addEventListener('mousedown', mouseDown, false);
     window.addEventListener('mouseup', mouseUp, false);
-
     function mouseUp() {
-      window.removeEventListener('mousemove', divMove, true);
+        window.removeEventListener('mousemove', divMove, true);
     }
-
     function mouseDown(e) {
-      var div = document.getElementsByClassName('draggable')[0];
-      x_pos = e.clientX - div.offsetLeft;
-      y_pos = e.clientY - div.offsetTop;
-      window.addEventListener('mousemove', divMove, true);
+        var div = document.getElementsByClassName('draggable')[0];
+        x_pos = e.clientX - div.offsetLeft;
+        y_pos = e.clientY - div.offsetTop;
+        window.addEventListener('mousemove', divMove, true);
     }
-
     function divMove(e) {
-      var div = document.getElementsByClassName('draggable')[0];
-    //   div.style.position = 'absolute';
-      div.style.top = (e.clientY - y_pos) + 'px';
-      div.style.left = (e.clientX - x_pos) + 'px';
+        var div = document.getElementsByClassName('draggable')[0];
+        //   div.style.position = 'absolute';
+        div.style.top = (e.clientY - y_pos) + 'px';
+        div.style.left = (e.clientX - x_pos) + 'px';
     }
-
-    script = $(`<script>
+}
 
 var timer;
-function editBoxDblClick(event) {
-    if (timer) clearTimeout(timer);
-    event.target.readOnly = false;
-    event.target.setAttribute("original", event.target.value);
+
+function sleepFor(sleepDuration) {
+    var now = new Date().getTime();
+    while (new Date().getTime() < now + sleepDuration) { /* do nothing */ }
 }
 
-function editBoxKey(event) {
-    if (event.key == "Enter") {
-        event.target.readOnly = true;
+function toInt(n) { return Math.round(Number(n)); }
 
-        inputName = event.target.className;
+var temp = "<div class='bookmarkItem' onclick='bookmarkItemClick(event)'>\
+<input class='BookmarkName' type='text' value='bookmarks[i][0] ' readonly='true' ondblclick='editBoxDblClick(event);' onkeydown='editBoxKey(event);' >\
+<input class='ScrollPoint' type='number' value='' readonly='true' ondblclick='editBoxDblClick(event);' onkeydown='editBoxKey(event);'>\
+<span class='hvr-temp' onclick='bookmarkItemDelete(event);'>x</span>\
+</div>";
 
-        var bookmarkItem = event.target.parentNode;
-        var bookmarkItemName = bookmarkItem.children[0].value;
-        var bookmarkItemValue = bookmarkItem.children[1].value;
+function saveDB() {
+    localStorage.setItem("FFSaveLocation", JSON.stringify(db));
+}
 
-        // delete it
-        db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
-        var ficId = ${ficId};
-        var bookmarks = db.fics[ficId].bookmarks;
+function loadDB() {
+    db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
+}
 
-        if(inputName == "BookmarkName") {
-            var bookmarkItemOldName = event.target.getAttribute("original");
-            event.target.removeAttribute("original");
 
-            for (let i = 0; i < bookmarks.length; i++) {
-                if (bookmarks[i][0] == bookmarkItemOldName) {
-                    console.log("GOTCHA");
-                    db.fics[ficId].bookmarks[i][0] = bookmarkItemName;
-                    break;
-                }
-            }
-        } else if (inputName == "ScrollPoint"){
-            event.target.removeAttribute("original");
+class BookmarksDivHandler {
+    constructor() {
+        var bookmarksDivNode = $(
+            '<div id="bookmarksDiv" class="draggable">\
+                <div class="title_edwin">Bookmarks\
+                <span class="drag_right_edwin hvr-temp">+</span>\
+            </div>\
+            <div class="content_edwin">\
+            </div>\
+        </div>');
 
-            for (let i = 0; i < bookmarks.length; i++) {
-                if (bookmarks[i][0] == bookmarkItemName) {
-                    console.log("GOTCHA");
-                    db.fics[ficId].bookmarks[i][1] = bookmarkItemValue;
-                    break;
+        $("body").prepend(bookmarksDivNode);
+
+        this._elem = bookmarksDivNode[0];
+
+        this.timer = null;
+
+        if (db.fics[pageId] && !db.fics[pageId].bookmarks) {
+            db.fics[pageId].bookmarks = [["last", db.fics[pageId].scrollPoint]];
+            saveDB();
+        }
+
+        this.showBookmarkItems();
+
+        this.showBookmarkItems_bound = this.showBookmarkItems.bind(this); // (*)
+
+        console.log(this.showBookmarkItems_bound);
+
+        this._elem.onclick = this.onClick.bind(this); // (*)
+        this._elem.ondblclick = this.onDblClick.bind(this); // (*)
+        this._elem.onkeydown = this.onKeyDown.bind(this); // (*)
+
+    }
+
+    showTags() {
+        var tag = `<div class="bookmark-tag" style="top:${bookmarks[i][1] + 30}px"><b>${bookmarks[i][0]}</b></div>`;
+        body.prepend(tag);
+        // TODO
+    }
+
+    showBookmarkItems() {
+        console.log("Bookmark Items Display refreshed.");
+        var contentArray = [];
+        if (db.fics && db.fics[pageId]) {
+            var bookmarks = db.fics[pageId].bookmarks;
+            if (bookmarks) {
+                for (let i = 0; i < bookmarks.length; i++) {
+                    var bookmarkNo = i;
+                    var node = "<div class='bookmarkItem' >\
+                        <input class='BookmarkName' type='text' value='"+ bookmarks[i][0] + "' readonly='true' >\
+                        <input class='ScrollPoint' type='number' value='" + toInt(bookmarks[i][1]) + "' readonly='true' >\
+                        <span class='hvr-temp'>x</span>\
+                    </div>";
+                    contentArray.push(node);
                 }
             }
         }
-        localStorage.setItem("FFSaveLocation", JSON.stringify(db));
-    } else {
+        var allBookmarks = $(contentArray.join(""));
+        var content = $(this._elem).find(".content_edwin");
+        content.empty();
+        content.append(allBookmarks)
     }
-}
 
-function bookmarkItemClick(event) {
-    if (timer) clearTimeout(timer);
+    onClick(event) {
+        if (this.timer) clearTimeout(this.timer);
+        this.timer = setTimeout(function () {
 
-    timer = setTimeout(function () {
+            console.log("clicked");
+            console.log(event.target);
+
+            var target = event.target;
+            if (target.tagName == "INPUT") {
+                var parent = target.parentNode;
+
+                if (parent.children.length == 3) {
+                    window.scroll(0, parent.children[1].value);
+                    console.log("JUMP");
+
+                } else {
+                    console.log("BULLSHIT: " + parent + " " + target);
+                }
+            } else if (target.tagName == "SPAN") {
+                var parent = target.parentNode;
+                if (parent.children.length == 3 && target.className == "hvr-temp") {    // do something better here
+                    // delete                    
+                    var bookmarkItem = parent;
+                    var bookmarkItemName = bookmarkItem.children[0].value;
+
+                    // reload DB so that we get any changes done before (in other tabs)
+                    loadDB();
+                    var bookmarks = db.fics[pageId].bookmarks;
+
+                    // delete it
+                    for (let i = 0; i < bookmarks.length; i++) {
+                        if (bookmarks[i][0] == bookmarkItemName) {
+                            db.fics[pageId].bookmarks.splice(i, 1);
+                            break;
+                        }
+                    }
+
+                    saveDB();               // Save changes
+                    this.showBookmarkItems();              // display new list
+                } else if (target.className == "drag_right_edwin hvr-temp") {
+                    // create 
+                    loadDB();
+                    var bookmarks = db.fics[pageId].bookmarks;
+                    
+                    var newName = "BM-" + toInt(window.pageYOffset);
+
+                    var found = false;
+                    // delete it
+                    for (let i = 0; i < bookmarks.length; i++) {
+                        if (bookmarks[i][0] == newName && bookmarks[i][1] == toInt(window.pageYOffset)) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if(!found)  {
+                        db.fics[pageId].bookmarks.push(["BM-" + toInt(window.pageYOffset), toInt(window.pageYOffset)]);
+                    }
+
+                    saveDB();               // Save changes
+                    this.showBookmarkItems();              // display new list
+                } else {
+                    console.log(target.className);
+                    console.log("BULLSHIdT: " + parent + " " + target);
+                }
+            }
+
+        }.bind(this), 250);             // THIS WAS SOOOO ANNOYING ....
+    };
+
+    onDblClick(event) {
+        if (this.timer) clearTimeout(this.timer);
+
+        console.log("dbl clicked");
+        console.log(event.target);
+
         var target = event.target;
-        if (event.target.tagName == "INPUT") {
-            target = target.parentNode;
+        if (target.tagName == "INPUT") {
+            event.target.readOnly = false;
+            event.target.setAttribute("original", event.target.value);
         }
+    };
 
-        if (target.children.length == 3) {
-            window.scroll(0, target.children[1].value);
-        } else {
-            console.log("BULLSHIT");
-        }
+    onKeyDown(event) {
+        console.log("Keydown");
+        console.log(event.target);
 
-    }, 250);
-}
+        var target = event.target;
+        if (target.tagName == "INPUT") {
 
+            if (event.key == "Enter") {
+                target.readOnly = true;
 
-function bookmarkItemDelete(event) {
-    var bookmarkItem = event.target.parentNode;
+                var inputName = target.className;
 
-    var bookmarkItemName = bookmarkItem.children[0].value;
+                var bookmarkItem = target.parentNode;
+                var bookmarkItemName = bookmarkItem.children[0].value;
+                var bookmarkItemValue = bookmarkItem.children[1].value;
 
-    // delete it
-    db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
+                console.log((bookmarkItem, bookmarkItemName, bookmarkItemValue));
 
-    var ficId = ${ficId };
-    var bookmarks = db.fics[ficId].bookmarks;
-    for (let i = 0; i < bookmarks.length; i++) {
-        if (bookmarks[i][0] == bookmarkItemName) {
-            bookmarkItem.parentNode.removeChild(bookmarkItem);
-            db.fics[ficId].bookmarks.splice(i, 1);
+                // delete it
+                loadDB();
+                var bookmarks = db.fics[pageId].bookmarks;
 
-            break;
+                if (inputName == "BookmarkName") {
+                    var bookmarkItemOldName = target.getAttribute("original");
+                    target.removeAttribute("original");
+
+                    for (let i = 0; i < bookmarks.length; i++) {
+                        if (bookmarks[i][0] == bookmarkItemOldName) {
+                            console.log("GOTCHA");
+                            db.fics[pageId].bookmarks[i][0] = bookmarkItemName;
+                            break;
+                        }
+                    }
+                } else if (inputName == "ScrollPoint") {
+                    target.removeAttribute("original");
+
+                    for (let i = 0; i < bookmarks.length; i++) {
+                        if (bookmarks[i][0] == bookmarkItemName) {
+                            console.log("GOTCHA");
+                            db.fics[pageId].bookmarks[i][1] = bookmarkItemValue;
+                            break;
+                        }
+                    }
+                }
+                saveDB();               // Save changes
+                this.showBookmarkItems();              // display new list  
+            }
         }
     }
-
-    localStorage.setItem("FFSaveLocation", JSON.stringify(db));
-    event.stopPropagation();
 }
 
-function toInt(n){ return Math.round(Number(n)); }
-
-function bookmarkItemAdd(event) {
-    db = JSON.parse(localStorage.getItem("FFSaveLocation") || '{}');
-
-    var ficId = ${ficId};
-
-    db.fics[ficId].bookmarks.push(["BM-" + toInt(window.pageYOffset), toInt(window.pageYOffset)]);
-    localStorage.setItem("FFSaveLocation", JSON.stringify(db));
-
-    var node = \`<div class="bookmarkItem" onclick="bookmarkItemClick(event)">
-<input class="BookmarkName" type="text" value="\`+"BM-"+toInt(window.pageYOffset) +\`" readonly="true" ondblclick="editBoxDblClick(event);" onkeydown="editBoxKey(event);" >
-<input class="ScrollPoint" type="number" value="\` +toInt(window.pageYOffset) +\`" readonly="true" ondblclick="editBoxDblClick(event);" onkeydown="editBoxKey(event);">
-<span class="hvr-temp" onclick="bookmarkItemDelete(event)">x</span>
-</div>\`;
-
-var content = document.querySelector("#bookmarksDiv .content_edwin");
-content.innerHTML = content.innerHTML + node;
-    event.stopPropagation();
-}
-
-</script>`);
-    body.append(script);
-}
