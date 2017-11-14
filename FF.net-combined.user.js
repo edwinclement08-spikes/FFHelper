@@ -195,6 +195,7 @@ function enhanceStory() {
     _fontastic_change_width(75);
     $("#storytext").css("fontSize", "1.5em");
 
+    
 
     //Adding buttons to page;
     addButtons();
@@ -224,6 +225,12 @@ function enhanceStory() {
     saveDB();
 
     createBookmarksDiv();
+
+    // $("#storytextp").css("-webkit-user-select", "text"); /* Chrome, Opera, Safari */
+    // $("#storytextp").css("-moz-user-select", "text"); /* Firefox 2+ */
+    // $("#storytextp").css("-ms-user-select", "text"); /* IE 10+ */
+    $("#storytextp").css("user-select", "text"); /*Standard syntax */
+    logger.log(["After", $("#storytextp")]);
 }
 
 function addButtons() {
