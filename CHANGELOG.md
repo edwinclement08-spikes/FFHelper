@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
     * add a sort/filter bar
     * add bookmark tag display 
     * do the settings at the end of page thingie    
+    * make this work on community pages, too.
+    * Convert to WebExtensions
+    * [IMPORTANT] add a system that can asynchronously load details of fanfiction.net links anywhere on web
 - Bugs 
     * None
 - Performance
@@ -21,12 +24,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
+### Changed
+### Removed
+
+## [0.7.1] - 2017-11-13
+### Added
 * User Page; show the completion badge
 * User and Fiction Page; show the Read/Unread badge
 * Added selectability to Story Text
-
-### Changed
-### Removed
 
 ## [0.7.0] - 2017-11-13
 ### Added

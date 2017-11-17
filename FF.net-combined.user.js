@@ -1,5 +1,5 @@
 // ==UserScript==
-// @version       0.7
+// @version       0.7.1
 // @include       *.fanfiction.net/s/*
 // @include       *.fanfiction.net/u/*
 // @namespace     tag:edwinclement08@gmail.com,2017-10-08:FFnetHelper
