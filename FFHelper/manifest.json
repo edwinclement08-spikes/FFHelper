@@ -1,0 +1,18 @@
+{
+
+  "manifest_version": 2,
+  "name": "FFHelper",
+  "version": "0.8.0",
+  "author": "Edwin Clement",
+  "description": "Adds some helpful Features for browsing fanfiction.net",
+  "icons": {
+    "48": "Icons/img-48.png",
+    "96": "Icons/img-96.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.fanfiction.net/s/*", "*://*.fanfiction.net/u/*"],
+      "js": ["jquery-3.2.1.min.js","FFHelper.js"]
+    }
+  ]
+}
