@@ -105,6 +105,26 @@ display:inline-block;
 #ffne {float:right;margin-left: 0.9em;}
 #ffne_button {font-size:1.3em;cursor:pointer;line-height: 1em;padding-right: 7px;}
 .ffne_hidden {display:none;}
+
+.fixed-title-bar {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    width: 50% !important;
+    /*height: 50px;*/
+    background-color: black;
+    border: white thin solid;
+    margin: auto;
+    left: 0px;
+    right: 0px;
+}
+.fixed-title-bar .item {
+    text-align:center;
+    display:block;
+    color: white;
+}
+
 </style>`));
 
 var logger = {};
@@ -198,7 +218,7 @@ function enhanceStory() {
     $("#storytext").css("fontSize", "1.5em");
 
 
-    logger.log("Testing");
+    // logger.log("Testing");
     //Adding buttons to page;
     addButtons();
     exportRest();
@@ -227,13 +247,18 @@ function enhanceStory() {
     saveDB();
 
     createBookmarksDiv();
+    createTitleBarDiv();
+    logger.log('Test123');
 
     // $("#storytextp").css("-webkit-user-select", "text"); /* Chrome, Opera, Safari */
     // $("#storytextp").css("-moz-user-select", "text"); /* Firefox 2+ */
     // $("#storytextp").css("-ms-user-select", "text"); /* IE 10+ */
     $("#storytextp").css("user-select", "text"); /*Standard syntax */
-    logger.log(["After", $("#storytextp")]);
+    // logger.log(["After", $("#storytextp")]);
+
+    $(".lc-wrapper").css("z-index", "0");
 }
+
 
 function addButtons() {
     // Adding buttons
@@ -271,7 +296,7 @@ function addHeaders() {
     var _chapters = document.getElementsByName('ffnee_chapter');
     for (let i = 0; i < _chapters.length; i++) {
         var item = _chapters.item(i); //chapter to which we are adding a header
-        var header = document.createElement('p');
+        // var header = document.createElement('p');
 
         $(_chapters.item(i)).prepend($('<h2>Chapter ' + (i + 1) + ': ' + item.getAttribute('title') + '</h2>'));
 
@@ -327,6 +352,7 @@ function exportChapters(e, start, end) {
             chapters[num] = parseChapter(response, num + 1);
             expText.nodeValue = 'Export: Chapter ' + String(totalStoryLength - storyLength + 1) + ' out of ' + totalStoryLength;
             storyLength--;
+
             if (storyLength == 0) {
                 parseStory(chapters);
                 expText.nodeValue = 'Story (again)';
@@ -335,6 +361,27 @@ function exportChapters(e, start, end) {
             }
         });
     }
+}
+
+function createTitleBarDiv() {
+    var template = $(`<span class="fixed-title-bar owl-carousel owl-theme">
+    </span>`);
+
+    var titles=[];
+    $("#content_wrapper_inner > span > select#chap_select").children().each(function(index,element ){titles.push(element.innerHTML)});
+    titles.forEach(function(element, index) {
+        var title = $(`<a class="item" href="#ffnee_ch${index}">${element}</a>`);
+        logger.log('Test'+index);
+        template.append(title);
+    });
+
+    logger.log(template);
+
+    $(".fixed-title-bar").append(template);
+    $("body").prepend(template);
+
+    
+
 }
 
 // Converting chapters' array into a whole;
@@ -372,7 +419,6 @@ function parseChapter(chapterHtml, chapterNumber) {
 function getChapterNameV2(obj) {
     var select = obj.find('#content_wrapper_inner > span > select#chap_select').find("option[selected='']")[0];
     return select.innerHTML.split(/[.\ ]{2}/)[1];
-
 }
 
 
@@ -416,6 +462,7 @@ function allChapterDoneEDWIN() {
         }
     });
 
+
     // get maximum scrollable position and set it
     // if not set, the "read" badge won't appear
     var limit = Math.max( document.body.scrollHeight, document.body.offsetHeight,
@@ -423,6 +470,26 @@ function allChapterDoneEDWIN() {
     db.fics[pageId].maxScroll = limit;
     saveDB();
 
+    var $owl = $('.owl-carousel');
+    
+    $owl.children().each( function( index ) {
+      $(this).attr( 'data-position', index ); // NB: .attr() instead of .data()
+    });
+    $owl.owlCarousel({
+      center: true,
+    //   loop: true,
+      items: 3,
+    });
+    
+    $(document).on('click', '.owl-item>a', function() {
+      $owl.trigger('to.owl.carousel', $(this).data( 'position' ) ); 
+    });
+
+    $( '.owl-dot' ).on( 'click', function() {
+        var index = $(this).index();
+        logger.log($(`#ffnee_ch${index}`)[0]);
+        $(`#ffnee_ch${index}`)[0].scrollIntoView();
+    })
 
 }
 function createBookmarksDiv() {

@@ -13,10 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
     * do the settings at the end of page thingie    
     * make this work on community pages, too.
     * [IMPORTANT] add a system that can asynchronously load details of fanfiction.net links anywhere on web
-    * add a small titlebar so that we can see the chapter name.
     * do something about that final width change thing as it wont work now
 - Bugs 
-    * None
+    * enable to reload the extension without having to reload page
 - Performance
     * reduce size of the scroll handler
 
@@ -25,6 +24,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
+    * add a small titlebar so that we can see the chapter name.         <NOW>
+
 ### Changed
 ### Removed
 

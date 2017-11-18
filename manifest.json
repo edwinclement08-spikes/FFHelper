@@ -2,7 +2,7 @@
 
   "manifest_version": 2,
   "name": "FFHelper",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "author": "Edwin Clement",
   "description": "Adds some helpful Features for browsing fanfiction.net",
   "icons": {
@@ -12,7 +12,9 @@
   "content_scripts": [
     {
       "matches": ["*://*.fanfiction.net/s/*", "*://*.fanfiction.net/u/*"],
-      "js": ["jquery-3.2.1.min.js","FFHelper.js"]
+      "js": ["jquery-3.2.1.min.js","owl.carousel.min.js", "FFHelper.js"],
+      "css": ["owl.carousel.min.css","owl.theme.default.css"]
+
     }
   ]
 }
