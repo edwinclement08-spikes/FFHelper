@@ -161,6 +161,17 @@ if (jQuery.isEmptyObject(db)) {
     localStorage.setItem("FFSaveLocation", JSON.stringify(db));
 }
 
+// for detecting whether the what chapter is currently visible TODO
+$.fn.isInViewport = function() {
+    var elementTop = $(this).offset().top;
+    var elementBottom = elementTop + $(this).outerHeight();
+
+    var viewportTop = $(window).scrollTop();
+    var viewportBottom = viewportTop + $(window).height();
+
+    return elementBottom > viewportTop && elementTop < viewportBottom;
+};
+
 $(function () {
     'use strict';
     var pageRE = /http[s]:\/\/www.fanfiction.net\/(s|u)\/(\d*)(.*)/;
@@ -371,7 +382,6 @@ function createTitleBarDiv() {
     $("#content_wrapper_inner > span > select#chap_select").children().each(function(index,element ){titles.push(element.innerHTML)});
     titles.forEach(function(element, index) {
         var title = $(`<a class="item" href="#ffnee_ch${index}">${element}</a>`);
-        logger.log('Test'+index);
         template.append(title);
     });
 
@@ -452,7 +462,15 @@ function loadChapter(num, callback) {
 
 function allChapterDoneEDWIN() {
     $(window).scrollTop(scrollPoint);
-    $(document).on('scroll', function () {
+    
+    var numChaps = getLength();
+    var chapIds = [];
+
+    for (let i = 0; i < numChaps; i++) {
+        chapIds.push($("#ffnee_ch"+i));
+    }
+
+    $(document).on('scroll resize', function () {
         if (db.fics) {
             if (db.fics[pageId]) {
                 loadDB();
@@ -460,8 +478,18 @@ function allChapterDoneEDWIN() {
                 saveDB();
             }
         }
-    });
 
+        chapIds.forEach(function(value) {
+            if (value.isInViewport()) {
+                try {
+                    var chapIndex  = value[0].id.match(/ffnee_ch(\d+)/)[1];
+                    $owl.trigger('to.owl.carousel', chapIndex );
+                } catch (error) {
+                    logger.log([487,'lg-error in finding the scrolled chapter id',]);
+                }
+            } 
+        })
+    });
 
     // get maximum scrollable position and set it
     // if not set, the "read" badge won't appear
@@ -471,7 +499,7 @@ function allChapterDoneEDWIN() {
     saveDB();
 
     var $owl = $('.owl-carousel');
-    
+
     $owl.children().each( function( index ) {
       $(this).attr( 'data-position', index ); // NB: .attr() instead of .data()
     });
@@ -480,7 +508,7 @@ function allChapterDoneEDWIN() {
     //   loop: true,
       items: 3,
     });
-    
+
     $(document).on('click', '.owl-item>a', function() {
       $owl.trigger('to.owl.carousel', $(this).data( 'position' ) ); 
     });
