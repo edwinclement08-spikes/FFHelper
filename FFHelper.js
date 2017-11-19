@@ -123,6 +123,8 @@ display:inline-block;
     text-align:center;
     display:block;
     color: white;
+    height:3em;
+    border: black thin solid
 }
 
 </style>`));
@@ -161,8 +163,9 @@ if (jQuery.isEmptyObject(db)) {
     localStorage.setItem("FFSaveLocation", JSON.stringify(db));
 }
 
-// for detecting whether the what chapter is currently visible TODO
-$.fn.isInViewport = function() {
+// JQuery Exts
+// for detecting whether the what chapter is currently visible 
+$.fn.isInViewport = function () {
     var elementTop = $(this).offset().top;
     var elementBottom = elementTop + $(this).outerHeight();
 
@@ -170,6 +173,16 @@ $.fn.isInViewport = function() {
     var viewportBottom = viewportTop + $(window).height();
 
     return elementBottom > viewportTop && elementTop < viewportBottom;
+};
+// for detecting scrollEnd
+$.fn.scrollEnd = function (callback, timeout) {
+    $(this).scroll(function () {
+        var $this = $(this);
+        if ($this.data('scrollTimeout')) {
+            clearTimeout($this.data('scrollTimeout'));
+        }
+        $this.data('scrollTimeout', setTimeout(callback, timeout));
+    });
 };
 
 $(function () {
@@ -245,7 +258,7 @@ function enhanceStory() {
     var found = false;
     var bookmarks = db.fics[pageId].bookmarks;
 
-    for(let i = 0; i < bookmarks.length; i++) {
+    for (let i = 0; i < bookmarks.length; i++) {
         if (bookmarks[i][0] == "last") {
             db.fics[pageId].bookmarks[i][1] = scrollPoint;
             found = true;
@@ -330,7 +343,7 @@ function exportRest(e) {
 
     if (chap_select)
         exportChapters(e, chap_select.value - 1);
-    else    {
+    else {
         allChapterDoneEDWIN();
         logger.log("It's a single Chapter fic ");
     }
@@ -378,9 +391,9 @@ function createTitleBarDiv() {
     var template = $(`<span class="fixed-title-bar owl-carousel owl-theme">
     </span>`);
 
-    var titles=[];
-    $("#content_wrapper_inner > span > select#chap_select").children().each(function(index,element ){titles.push(element.innerHTML)});
-    titles.forEach(function(element, index) {
+    var titles = [];
+    $("#content_wrapper_inner > span > select#chap_select").children().each(function (index, element) { titles.push(element.innerHTML) });
+    titles.forEach(function (element, index) {
         var title = $(`<a class="item" href="#ffnee_ch${index}">${element}</a>`);
         template.append(title);
     });
@@ -390,7 +403,7 @@ function createTitleBarDiv() {
     $(".fixed-title-bar").append(template);
     $("body").prepend(template);
 
-    
+
 
 }
 
@@ -460,17 +473,102 @@ function loadChapter(num, callback) {
     }
 }
 
-function allChapterDoneEDWIN() {
-    $(window).scrollTop(scrollPoint);
-    
+
+
+function calculateVisibilityForDivV2(div$) {
+    var windowHeight = $(window).height(),
+        docScroll = $(document).scrollTop(),
+        divPosition = div$.offset().top,
+        divHeight = div$.height(),
+        hiddenBefore = docScroll - divPosition,
+        hiddenAfter = (divPosition + divHeight) - (docScroll + windowHeight);
+    var result;
+    if ((docScroll > divPosition + divHeight) || (divPosition > docScroll + windowHeight)) {
+        // logger.log([483,'lg-hidden']);
+        return 0;
+    } else {
+        var result = 100;
+
+        if (hiddenBefore > 0) {
+            result -= (hiddenBefore * 100) / divHeight;
+        }
+        if (hiddenAfter > 0) {
+            result -= (hiddenAfter * 100) / divHeight;
+        }
+        return [result, (hiddenBefore * 100) / divHeight];
+    }
+}
+
+
+function calculateAndDisplayForAllDivs() {
     var numChaps = getLength();
     var chapIds = [];
 
     for (let i = 0; i < numChaps; i++) {
-        chapIds.push($("#ffnee_ch"+i));
+        chapIds.push($("#ffnee_ch" + i));
     }
 
-    $(document).on('scroll resize', function () {
+    var finished = [];
+
+    try {
+        chapIds.forEach(function (value) {
+
+            var x = calculateVisibilityForDivV2(value);
+            // logger.log([515,'lg-finaltestset',value[0].id, x[1], x[0] > 0 && (Math.ceil(x[1]) >= 0 )]);
+            
+            if(x[0] > 0 && (Math.ceil(x[1]) >= 0 )) {
+                finished.push([value[0].id,Math.ceil(x[1])]);
+            }
+        });
+        logger.log([519, 'lg-final', finished[0][0],  finished[0][1]]);
+                
+        var chapIndex = parseInt(finished[0][0].match(/ffnee_ch(\d+)/)[1]);
+        var completed = finished[0][1];
+
+        var parents = $(".owl-stage").children()
+
+        parents.each(function (index, value) {
+            logger.log([528,'lg-array',value, index]);
+            if(index < chapIndex ){
+                $(value).css("background","grey");
+            } else if (index > chapIndex ){
+                $(value).css("background","transparent");
+            } else {
+                $(value).css("background",`linear-gradient(to right, grey, grey ${completed}%, transparent ${completed}%, transparent)`);
+            }
+        });
+
+    } catch (error) {
+        if (error instanceof TypeError) {
+        } else {
+            logger.log([530,'lg-error while getting the scroll positions', error]);
+        }
+    }
+
+
+}
+
+
+function allChapterDoneEDWIN() {
+    // fixed the odd positioning
+    $(".storytext").css("width", "85%")
+
+    $(window).scrollTop(scrollPoint);
+
+    var numChaps = getLength();
+    var chapIds = [];
+
+    for (let i = 0; i < numChaps; i++) {
+        chapIds.push($("#ffnee_ch" + i));
+    }
+
+    $(document).ready(function () {
+        calculateAndDisplayForAllDivs();
+    });
+
+
+    // how to call it (with a 1000ms timeout):
+    $(window).scrollEnd(function () {
         if (db.fics) {
             if (db.fics[pageId]) {
                 loadDB();
@@ -478,42 +576,68 @@ function allChapterDoneEDWIN() {
                 saveDB();
             }
         }
+        calculateAndDisplayForAllDivs();
 
-        chapIds.forEach(function(value) {
+        chapIds.forEach(function (value) {
             if (value.isInViewport()) {
                 try {
-                    var chapIndex  = value[0].id.match(/ffnee_ch(\d+)/)[1];
-                    $owl.trigger('to.owl.carousel', chapIndex );
+                    var chapIndex = value[0].id.match(/ffnee_ch(\d+)/)[1];
+                    $owl.trigger('to.owl.carousel', chapIndex);
                 } catch (error) {
-                    logger.log([487,'lg-error in finding the scrolled chapter id',]);
+                    logger.log([487, 'lg-error in finding the scrolled chapter id',]);
                 }
-            } 
+            }
         })
-    });
+
+
+    }, 100);
+
+
+
+    // $(document).on('scroll resize', function () {
+    //     if (db.fics) {
+    //         if (db.fics[pageId]) {
+    //             loadDB();
+    //             db.fics[pageId].scrollPoint = window.pageYOffset;
+    //             saveDB();
+    //         }
+    //     }
+
+    //     chapIds.forEach(function(value) {
+    //         if (value.isInViewport()) {
+    //             try {
+    //                 var chapIndex  = value[0].id.match(/ffnee_ch(\d+)/)[1];
+    //                 $owl.trigger('to.owl.carousel', chapIndex );
+    //             } catch (error) {
+    //                 logger.log([487,'lg-error in finding the scrolled chapter id',]);
+    //             }
+    //         } 
+    //     })
+    // });
 
     // get maximum scrollable position and set it
     // if not set, the "read" badge won't appear
-    var limit = Math.max( document.body.scrollHeight, document.body.offsetHeight,
-        document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight );
+    var limit = Math.max(document.body.scrollHeight, document.body.offsetHeight,
+        document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);
     db.fics[pageId].maxScroll = limit;
     saveDB();
 
     var $owl = $('.owl-carousel');
 
-    $owl.children().each( function( index ) {
-      $(this).attr( 'data-position', index ); // NB: .attr() instead of .data()
+    $owl.children().each(function (index) {
+        $(this).attr('data-position', index); // NB: .attr() instead of .data()
     });
     $owl.owlCarousel({
-      center: true,
-    //   loop: true,
-      items: 3,
+        center: true,
+        //   loop: true,
+        items: 3,
     });
 
-    $(document).on('click', '.owl-item>a', function() {
-      $owl.trigger('to.owl.carousel', $(this).data( 'position' ) ); 
+    $(document).on('click', '.owl-item>a', function () {
+        $owl.trigger('to.owl.carousel', $(this).data('position'));
     });
 
-    $( '.owl-dot' ).on( 'click', function() {
+    $('.owl-dot').on('click', function () {
         var index = $(this).index();
         logger.log($(`#ffnee_ch${index}`)[0]);
         $(`#ffnee_ch${index}`)[0].scrollIntoView();
@@ -932,30 +1056,30 @@ class Story {
         this.removeOtherClasses();
         this.storyElem.addClass("ffn_dislike");
 
-        db.fics[this.pageId].opinion = FIC_DISLIKED ;
+        db.fics[this.pageId].opinion = FIC_DISLIKED;
         this.saveFic();
     }
     mark() {
         this.loadFic();
         this.removeOtherClasses();
         this.storyElem.addClass("ffn_mark");
-        db.fics[this.pageId].opinion = FIC_MARKED ;
+        db.fics[this.pageId].opinion = FIC_MARKED;
         this.saveFic();
     }
     calibre() {
         this.loadFic();
         this.removeOtherClasses();
         this.storyElem.addClass("ffn_calibre");
-        db.fics[this.pageId].opinion = FIC_CALIBRE ;
+        db.fics[this.pageId].opinion = FIC_CALIBRE;
         this.saveFic();
     }
     clear() {
         this.loadFic();
         this.removeOtherClasses();
-        db.fics[this.pageId].opinion = FIC_BLANK ;
+        db.fics[this.pageId].opinion = FIC_BLANK;
         this.saveFic();
     }
-    removeOtherClasses(){
+    removeOtherClasses() {
         this.storyElem.removeClass("ffn_like ffn_dislike ffn_mark ffn_calibre");
     }
 
@@ -972,7 +1096,7 @@ class Story {
         `;
     }
 
-    getTitle()  {
+    getTitle() {
         var title = this.storyElem.find("b");
 
         if (title.length == 0) {
@@ -999,16 +1123,16 @@ class Story {
     }
 
     addReadBadge() {
-        if(db.fics[this.pageId]){
-            if(db.fics[this.pageId].maxScroll)   {
+        if (db.fics[this.pageId]) {
+            if (db.fics[this.pageId].maxScroll) {
                 var readVal = toInt(db.fics[this.pageId].scrollPoint / db.fics[this.pageId].maxScroll * 100);
                 var ReadBadge = this.getBadge("read-status",
-                (readVal > 95) ? "Read" : "Unread",
-                readVal);
+                    (readVal > 95) ? "Read" : "Unread",
+                    readVal);
 
                 var title = this.getTitle();
                 title.after($(ReadBadge));
             }
-        }        
+        }
     }
 }

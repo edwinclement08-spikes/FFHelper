@@ -17,16 +17,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Bugs 
     * enable to reload the extension without having to reload page
 - Performance
-    * reduce size of the scroll handler
 
 ## Refactoring
 * remove all references to Edwin(my name)
 
 ## [Unreleased]
 ### Added
-    * add a small titlebar so that we can see the chapter name.         <NOW>
-
+    * add a small titlebar so that we can see the chapter name.  
+    * added a progressbar to the titlebar
 ### Changed
+    * scroll handler run at scroll end, made it much faster
 ### Removed
 
 ## [0.8.0] - 2017-11-17
