@@ -1,0 +1,18 @@
+{
+  "name": "ffhelper",
+  "version": "0.8.1",
+  "description": "Adds some helpful Features for browsing fanfiction.net",
+  "main": "FFHelper.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Edwin Clement",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "graceful-fs": "4.1.11",
+    "gulp": "3.9.1",
+    "gulp-sass": "3.1.0",
+    "minimatch": "3.0.4",
+    "node-sass": "4.7.2"
+  }
+}

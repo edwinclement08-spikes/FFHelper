@@ -1,17 +1,9 @@
-// ==UserScript==
-// @version       0.7.1
-// @include       *.fanfiction.net/s/*
-// @include       *.fanfiction.net/u/*
+// @version       0.8.1
 // @namespace     tag:edwinclement08@gmail.com,2017-10-08:FFnetHelper
 // @name          FFnetHelper
 // @author        Edwin Clement
 // @description   Adds some helpful Features for browsing FF.net
 // @changes       Rewrote some code to use jquery, changed design to fit the new ff.net scheme
-// @grant         GM_xmlhttpRequest
-// @grant         GM_addStyle
-// @require       http://code.jquery.com/jquery-1.12.4.min.js
-// @require       https://greasyfork.org/scripts/17419-underscore-js-1-8-3/code/Underscorejs%20183.js?version=109803
-// ==/UserScript==
 
 // Credit
 // FanFictionNavigator (by Andy Scull)  https://greasyfork.org/en/scripts/25670-fanfictionnavigator
@@ -19,115 +11,6 @@
 
 /*jslint es6:true*/
 "use strict";
-
-$("body").append($(`<style>
-.night-mode {
-    color:#fff ;
-    background-color: #000;
-}
-
-/* Bookmarks Division */
-#bookmarksDiv {
-    position:fixed;
-    background:lightgrey;
-    border: grey thin solid;
-    top:75%; left:80%;
-    min-height: 10%; min-width: 10%;
-    user-select:none !important;
-    z-index:100;
-}
-.bookmark-tag {
-    color: cornsilk;
-    position: absolute;
-    background-color: seagreen !important;
-    padding: 5px;
-    z-index: 0;
-}
-
-#bookmarksDiv > .title_edwin                        {padding:5px; border: grey thin solid; color: black; user-select:none !important;}
-#bookmarksDiv .content_edwin                        {padding:2px;}
-#bookmarksDiv .content_edwin .#content_wrapperbookmarkItem          {border: grey 2px solid; margin: 2px;}
-#bookmarksDiv .content_edwin .bookmarkItem input    {width:85px; cursor:pointer}
-#bookmarksDiv .content_edwin .bookmarkItem span     {padding:5px; cursor:pointer}
-#bookmarksDiv .drag_right_edwin                     {float: right; padding: 0px 2px;}
-.hvr-temp {  display: inline-block;  vertical-align: middle;  -webkit-transform: perspective(1px) translateZ(0);  transform: perspective(1px) translateZ(0);  box-shadow: 0 0 1px transparent;  overflow: hidden;  -webkit-transition-duration: 0.3s;  transition-duration: 0.3s;  -webkit-transition-property: color, background-color, box-shadow;    transition-property: color, background-color,  box-shadow;}
-.hvr-temp:hover, .hvr-temp:focus, .hvr-temp:active {  background-color: #2098D1;  color: white;  box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);}
-
-/* Badges */
-.badge-local {
-margin: 2px;
-border-radius: 5px;
-}
-
-.badge-local > *{
-display:inline-block;
-padding:2px;
-}
-.z-list .badge-local *{
-padding:1px;
-font-size:13px;
-}
-
-.badge-local .status{
-font-weight:bold;
-}
-
-.badge-local .noOfWords{
-border-left: #63746B solid thin;
-}
-
-.badge-local-completed{
-background-color: #B2C3B3 ;
-color:#1E2520;
-border: #63746B solid thin;
-display:inline-block;
-}
-
-.badge-local-wip{
-background-color: #F09090 ;
-color:#621122;
-border: #63746B solid thin;
-display:inline-block;
-}
-
-.badge-local-read-status{
-background-color: #A9A7FF ;
-color:#1E2520;
-border: #63746B solid thin;
-display:inline-block;
-}
-
-
-/* ffnet */
-.ffne_action {padding-right: 7px; cursor:pointer;}
-.ffne_action:hover {}
-#ffne_export {}
-#ffne {float:right;margin-left: 0.9em;}
-#ffne_button {font-size:1.3em;cursor:pointer;line-height: 1em;padding-right: 7px;}
-.ffne_hidden {display:none;}
-
-.fixed-title-bar {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    z-index: 9999;
-    width: 50% !important;
-    /*height: 50px;*/
-    background-color: black;
-    border: white thin solid;
-    margin: auto;
-    left: 0px;
-    right: 0px;
-}
-.fixed-title-bar .item {
-    text-align:center;
-    display:block;
-    color: white;
-    height:3em;
-    border: black thin solid
-}
-
-</style>`));
 
 var logger = {};
 function log(item) {        // to have more recognizable logs
@@ -238,11 +121,8 @@ function enhanceStory() {
     // set default width and font size
     // _fontastic_change_width(75);
 
-
     $("#storytext").css("fontSize", "1.5em");
 
-
-    // logger.log("Testing");
     //Adding buttons to page;
     addButtons();
     exportRest();
@@ -253,7 +133,6 @@ function enhanceStory() {
     }
 
     scrollPoint = db.fics[pageId].scrollPoint;
-
 
     var found = false;
     var bookmarks = db.fics[pageId].bookmarks;
@@ -272,13 +151,12 @@ function enhanceStory() {
 
     createBookmarksDiv();
     createTitleBarDiv();
-    logger.log('Test123');
+    // logger.log('Test123');
 
-    // $("#storytextp").css("-webkit-user-select", "text"); /* Chrome, Opera, Safari */
-    // $("#storytextp").css("-moz-user-select", "text"); /* Firefox 2+ */
-    // $("#storytextp").css("-ms-user-select", "text"); /* IE 10+ */
+    $("#storytextp").css("-webkit-user-select", "text"); /* Chrome, Opera, Safari */
+    $("#storytextp").css("-moz-user-select", "text"); /* Firefox 2+ */
+    $("#storytextp").css("-ms-user-select", "text"); /* IE 10+ */
     $("#storytextp").css("user-select", "text"); /*Standard syntax */
-    // logger.log(["After", $("#storytextp")]);
 
     $(".lc-wrapper").css("z-index", "0");
 }
@@ -324,8 +202,6 @@ function addHeaders() {
 
         $(_chapters.item(i)).prepend($('<h2>Chapter ' + (i + 1) + ': ' + item.getAttribute('title') + '</h2>'));
 
-        // header.innerHTML = '<h2>Chapter ' + (i + 1) + ': ' + item.getAttribute('title') + '</h2>';
-        // item.insertBefore(header, item.firstChild);
     }
 }
 
@@ -398,21 +274,16 @@ function createTitleBarDiv() {
         template.append(title);
     });
 
-    logger.log(template);
+    // logger.log(template);
 
-    $(".fixed-title-bar").append(template);
+    $("body").find(".fixed-title-bar").remove();
     $("body").prepend(template);
-
-
-
 }
 
 // Converting chapters' array into a whole;
 function parseStory(chapters) {
     var numCh = chapters.length;
-    //document.body.innerHTML=chapters[0];
     var appendNode = document.getElementById('storytext');
-    // appendNode.innerHTML = '';
     $(appendNode).html("");
     var firstChapter = true;
     for (var i = 0; i < numCh; i++) {
@@ -444,7 +315,6 @@ function getChapterNameV2(obj) {
     return select.innerHTML.split(/[.\ ]{2}/)[1];
 }
 
-
 //  Getting number of chapters;
 function getLength() {
     var chNum = document.getElementById('chap_select');
@@ -473,8 +343,6 @@ function loadChapter(num, callback) {
     }
 }
 
-
-
 function calculateVisibilityForDivV2(div$) {
     var windowHeight = $(window).height(),
         docScroll = $(document).scrollTop(),
@@ -484,7 +352,6 @@ function calculateVisibilityForDivV2(div$) {
         hiddenAfter = (divPosition + divHeight) - (docScroll + windowHeight);
     var result;
     if ((docScroll > divPosition + divHeight) || (divPosition > docScroll + windowHeight)) {
-        // logger.log([483,'lg-hidden']);
         return 0;
     } else {
         var result = 100;
@@ -512,42 +379,35 @@ function calculateAndDisplayForAllDivs() {
 
     try {
         chapIds.forEach(function (value) {
-
             var x = calculateVisibilityForDivV2(value);
-            // logger.log([515,'lg-finaltestset',value[0].id, x[1], x[0] > 0 && (Math.ceil(x[1]) >= 0 )]);
-            
-            if(x[0] > 0 && (Math.ceil(x[1]) >= 0 )) {
-                finished.push([value[0].id,Math.ceil(x[1])]);
+            if (x[0] > 0 && (Math.ceil(x[1]) >= 0)) {
+                finished.push([value[0].id, Math.ceil(x[1])]);
             }
         });
-        logger.log([519, 'lg-final', finished[0][0],  finished[0][1]]);
-                
+
         var chapIndex = parseInt(finished[0][0].match(/ffnee_ch(\d+)/)[1]);
         var completed = finished[0][1];
 
         var parents = $(".owl-stage").children()
 
         parents.each(function (index, value) {
-            logger.log([528,'lg-array',value, index]);
-            if(index < chapIndex ){
-                $(value).css("background","grey");
-            } else if (index > chapIndex ){
-                $(value).css("background","transparent");
+            // logger.log([528, 'lg-array', value, index]);
+            if (index < chapIndex) {
+                $(value).css("background", "grey");
+            } else if (index > chapIndex) {
+                $(value).css("background", "transparent");
             } else {
-                $(value).css("background",`linear-gradient(to right, grey, grey ${completed}%, transparent ${completed}%, transparent)`);
+                $(value).css("background", `linear-gradient(to right, grey, grey ${completed}%, transparent ${completed}%, transparent)`);
             }
         });
 
     } catch (error) {
         if (error instanceof TypeError) {
         } else {
-            logger.log([530,'lg-error while getting the scroll positions', error]);
+            logger.log([530, 'lg-error while getting the scroll positions', error]);
         }
     }
-
-
 }
-
 
 function allChapterDoneEDWIN() {
     // fixed the odd positioning
@@ -565,7 +425,6 @@ function allChapterDoneEDWIN() {
     $(document).ready(function () {
         calculateAndDisplayForAllDivs();
     });
-
 
     // how to call it (with a 1000ms timeout):
     $(window).scrollEnd(function () {
@@ -589,31 +448,7 @@ function allChapterDoneEDWIN() {
             }
         })
 
-
     }, 100);
-
-
-
-    // $(document).on('scroll resize', function () {
-    //     if (db.fics) {
-    //         if (db.fics[pageId]) {
-    //             loadDB();
-    //             db.fics[pageId].scrollPoint = window.pageYOffset;
-    //             saveDB();
-    //         }
-    //     }
-
-    //     chapIds.forEach(function(value) {
-    //         if (value.isInViewport()) {
-    //             try {
-    //                 var chapIndex  = value[0].id.match(/ffnee_ch(\d+)/)[1];
-    //                 $owl.trigger('to.owl.carousel', chapIndex );
-    //             } catch (error) {
-    //                 logger.log([487,'lg-error in finding the scrolled chapter id',]);
-    //             }
-    //         } 
-    //     })
-    // });
 
     // get maximum scrollable position and set it
     // if not set, the "read" badge won't appear
@@ -625,6 +460,7 @@ function allChapterDoneEDWIN() {
     var $owl = $('.owl-carousel');
 
     $owl.children().each(function (index) {
+
         $(this).attr('data-position', index); // NB: .attr() instead of .data()
     });
     $owl.owlCarousel({
@@ -677,6 +513,8 @@ class BookmarksDivHandler {
             <div class="content_edwin">
             </div>
         </div>`);
+
+        $("body").find("#bookmarksDiv").remove();
 
         $("body").prepend(bookmarksDivNode);
 
@@ -853,10 +691,7 @@ function enhanceUser() {
     $("#content_wrapper").css('background-color', 'inherit');
 
     $("#content_wrapper_inner a").addClass("link_colored");
-
     $("div.mystories").find(".z-indent.z-padtop .z-padtop2 ").removeClass("xgray").addClass("metadata");
-
-
 }
 
 // Fics:
@@ -876,64 +711,6 @@ const COLOR_DISLIKED = '#FCB0B0';
 const COLOR_MARKED = '#8F8F8F';
 const COLOR_CALIBRE = '#F1D173';
 const COLOR_CLEARED = '#FFF';
-
-
-$("body").append($(`<style>
-
-#content_wrapper_inner .link_colored {color: #79a00f;}
-#content_wrapper_inner  .ffn_like  .link_colored    {color: rgb(96, 0, 255);    }
-#content_wrapper_inner .ffn_dislike .link_colored  {color: rgb(114, 6, 6);}
-#content_wrapper_inner  .ffn_mark .link_colored {color: rgb(95, 0, 0);}
-#content_wrapper_inner  .ffn_calibre .link_colored  {color: rgb(95, 0, 0);}
-
-
-span.ffn_like     {}
-span.ffn_mark     {}
-span.ffn_calibre  {}
-span.ffn_dislike  { text-decoration: line-through; font-weight: bold; }
-.ffn_like      { background-color:${COLOR_LIKED}    !important; color:black !important; }
-.ffn_dislike   { background-color:${COLOR_DISLIKED} !important; color:black !important; }
-.ffn_mark      { background-color:${COLOR_MARKED}   !important; color:black !important; }
-.ffn_calibre   { background-color:${COLOR_CALIBRE}  !important; color:black !important; }
-
-.ffh_buttons    {
-    padding         : 1px;
-    border-radius   : 2px;
-    margin-right    : 4px;
-    cursor          : pointer;
-    border          : thin black solid;
-}
-.ffh_buttons  span{
-    color           : black;
-}
-
-.like_story  {
-    background-color: ${COLOR_LIKED};
-}
-.dislike_story   {
-    background-color: ${COLOR_DISLIKED};
-}
-.mark_story  {
-    background-color: ${COLOR_MARKED};
-}
-.calibre_story   {
-    background-color: ${COLOR_CALIBRE};
-}
-.clear_story {
-    background-color: ${COLOR_CLEARED};
-}
-.new_like_actions {
-    margin:0px 0px 0px 20px;
-    font-size:11px;
-    padding: 5px;
-}
-
-#profile_top, .z-list   {
-    padding: 4px;
-    border: thin solid black;
-    border-radius: 5px;
-}
-</style>`));
 
 function enhanceBoth() {
     $(".z-list").each(function () {
@@ -967,7 +744,9 @@ class Story {
             <span href="" class="ffh_buttons mark_story">      <span>Mark     </span></span>
             <span href="" class="ffh_buttons calibre_story">   <span>Calibre  </span></span>
             <span href="" class="ffh_buttons clear_story">     <span>Clear    </span></span>
-        </div>`);
+        </div>
+        `);
+        this.storyElem.find(".new_like_actions").remove();
         this.storyElem.append(this.template);
 
         this.addActions();
@@ -1013,7 +792,6 @@ class Story {
                     this.removeOtherClasses();
             }
 
-
         } else {
             // Initialize it
             db.fics[this.pageId].opinion = FIC_BLANK;
@@ -1023,6 +801,9 @@ class Story {
         // add the badges
         this.addCompletionBadge();
         this.addReadBadge();
+
+        // add the bar
+        this.addReadProgress();
     }
     addActions() {
         var buttonBar = this.storyElem.find('.new_like_actions');
@@ -1119,6 +900,7 @@ class Story {
         var completionBadge = this.getBadge((isCompleted ? "completed" : "wip"), (isCompleted ? "Completed" : "Work in Progress"), noOfWords);
 
         var title = this.getTitle();
+        this.storyElem.find(".badge-local.badge-local-completed, .badge-local.badge-local-completed").remove();        
         title.after($(completionBadge));
     }
 
@@ -1131,8 +913,37 @@ class Story {
                     readVal);
 
                 var title = this.getTitle();
+
+                this.storyElem.find(".badge-local.badge-local-read-status").remove();
                 title.after($(ReadBadge));
             }
         }
+    }
+
+    addReadProgress()   {
+        try {
+            if (db.fics[this.pageId]) {
+                if (db.fics[this.pageId].maxScroll) {
+                    var readVal = toInt(db.fics[this.pageId].scrollPoint / db.fics[this.pageId].maxScroll * 100);
+
+                    var template = $(`
+                    <div class="cssProgress">
+                        <div class="progress4">
+                            <div style="width: ${readVal}%;" class="cssProgress-bar cssProgress-warning cssProgress-glow-active cssProgress-3x">
+                            </div>
+                        </div>
+                    </div>
+                    `);
+
+                    this.storyElem.find(".cssProgress").remove();
+                    this.storyElem.append(template);
+
+                }
+            }
+        } catch (error) {
+            logger.log([982,'lg-readProgress',error]);
+
+        }
+
     }
 }

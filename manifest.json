@@ -13,8 +13,7 @@
     {
       "matches": ["*://*.fanfiction.net/s/*", "*://*.fanfiction.net/u/*"],
       "js": ["jquery-3.2.1.min.js","owl.carousel.min.js", "FFHelper.js"],
-      "css": ["owl.carousel.min.css","owl.theme.default.css"]
-
+      "css": ["owl.carousel.min.css","owl.theme.invert.css","cssprogress.min.css", "ffhelper.custom.css"]
     }
   ]
 }

@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 # TODO
 - Features
-    * add a progress bar
+    * add a progress bar to Fiction pages
     * add a hide option to the fics which will hide the fic from ever listing
     * add a sort/filter bar
     * add bookmark tag display 
@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
     * [IMPORTANT] add a system that can asynchronously load details of fanfiction.net links anywhere on web
     * do something about that final width change thing as it wont work now
 - Bugs 
-    * enable to reload the extension without having to reload page
+    * proper last read system.
 - Performance
 
 ## Refactoring
@@ -23,10 +23,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
-    * add a small titlebar so that we can see the chapter name.  
-    * added a progressbar to the titlebar
 ### Changed
-    * scroll handler run at scroll end, made it much faster
+### Removed
+
+## [0.8.1] - 2017-11-22
+### Added
+* add a titlebar so that we can see the chapter name and current progress
+* added a progressbar to the titlebar
+### Changed
+* enable to reload the extension without having to reload page
+* scroll handler run at scroll end, made it much faster
+* extracted css in the mainfile to outside
+* started using scss and gulp
+* made the titlebar look good in dark theme
 ### Removed
 
 ## [0.8.0] - 2017-11-17

@@ -1,0 +1,198 @@
+.night-mode {
+  color: #fff;
+  background-color: #000; }
+
+.bookmark-tag {
+  color: cornsilk;
+  position: absolute;
+  background-color: seagreen !important;
+  padding: 5px;
+  z-index: 0; }
+
+/* Bookmarks Division */
+#bookmarksDiv {
+  position: fixed;
+  border: grey thin solid;
+  top: 75%;
+  left: 80%;
+  min-height: 10%;
+  min-width: 10%;
+  user-select: none !important;
+  z-index: 100; }
+  #bookmarksDiv .title_edwin {
+    padding: 5px;
+    border: grey thin solid;
+    user-select: none !important; }
+  #bookmarksDiv .drag_right_edwin {
+    float: right;
+    padding: 0px 2px; }
+  #bookmarksDiv .content_edwin {
+    padding: 2px; }
+    #bookmarksDiv .content_edwin .bookmarkItem {
+      border: grey 2px solid;
+      margin: 2px; }
+      #bookmarksDiv .content_edwin .bookmarkItem input {
+        width: 85px;
+        cursor: pointer;
+        background: black;
+        color: white; }
+      #bookmarksDiv .content_edwin .bookmarkItem span {
+        padding: 5px;
+        cursor: pointer; }
+
+.hvr-temp {
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);
+  box-shadow: 0 0 1px transparent;
+  overflow: hidden;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: color, background-color, box-shadow;
+  transition-property: color, background-color,  box-shadow; }
+
+.hvr-temp:hover, .hvr-temp:focus, .hvr-temp:active {
+  background-color: #2098D1;
+  color: white;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.6); }
+
+/* Badges */
+.badge-local {
+  margin: 2px;
+  border-radius: 5px; }
+  .badge-local > * {
+    display: inline-block;
+    padding: 2px; }
+  .badge-local .status {
+    font-weight: bold; }
+  .badge-local .noOfWords {
+    border-left: #63746B solid thin; }
+
+.badge-local-completed {
+  background-color: #B2C3B3;
+  color: #1E2520;
+  border: #63746B solid thin;
+  display: inline-block; }
+
+.badge-local-wip {
+  background-color: #F09090;
+  color: #621122;
+  border: #63746B solid thin;
+  display: inline-block; }
+
+.badge-local-read-status {
+  background-color: #A9A7FF;
+  color: #1E2520;
+  border: #63746B solid thin;
+  display: inline-block; }
+
+.z-list .badge-local * {
+  padding: 1px;
+  font-size: 13px; }
+
+/* ffnet */
+.ffne_action {
+  padding-right: 7px;
+  cursor: pointer; }
+
+#ffne {
+  float: right;
+  margin-left: 0.9em; }
+
+#ffne_button {
+  font-size: 1.3em;
+  cursor: pointer;
+  line-height: 1em;
+  padding-right: 7px; }
+
+.ffne_hidden {
+  display: none; }
+
+.fixed-title-bar {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 50% !important;
+  /*height: 50px;*/
+  background-color: black;
+  border: white thin solid;
+  margin: auto;
+  left: 0px;
+  right: 0px; }
+  .fixed-title-bar .item {
+    text-align: center;
+    display: block;
+    color: white;
+    height: 3em;
+    border: darkgray thin dashed; }
+
+#content_wrapper_inner .link_colored {
+  color: #79a00f; }
+
+#content_wrapper_inner .ffn_like .link_colored {
+  color: #6000ff; }
+
+#content_wrapper_inner .ffn_dislike .link_colored {
+  color: #720606; }
+
+#content_wrapper_inner .ffn_mark .link_colored {
+  color: #5f0000; }
+
+#content_wrapper_inner .ffn_calibre .link_colored {
+  color: #5f0000; }
+
+span.ffn_dislike {
+  text-decoration: line-through;
+  font-weight: bold; }
+
+.ffn_like {
+  background-color: #C4FFCA !important;
+  color: black !important; }
+
+.ffn_dislike {
+  background-color: #FCB0B0 !important;
+  color: black !important; }
+
+.ffn_mark {
+  background-color: #8F8F8F !important;
+  color: black !important; }
+
+.ffn_calibre {
+  background-color: #F1D173 !important;
+  color: black !important; }
+
+.ffh_buttons {
+  padding: 1px;
+  border-radius: 2px;
+  margin-right: 4px;
+  cursor: pointer;
+  border: thin black solid; }
+  .ffh_buttons span {
+    color: black; }
+
+.like_story {
+  background-color: #C4FFCA; }
+
+.dislike_story {
+  background-color: #FCB0B0; }
+
+.mark_story {
+  background-color: #8F8F8F; }
+
+.calibre_story {
+  background-color: #F1D173; }
+
+.clear_story {
+  background-color: #FFFFFF; }
+
+.new_like_actions {
+  margin: 0px 0px 0px 20px;
+  font-size: 11px;
+  padding: 5px; }
+
+#profile_top, .z-list {
+  padding: 4px;
+  border: thin solid black;
+  border-radius: 5px; }
